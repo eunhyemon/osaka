@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MY ARCHIVE // OSAKA 2026</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Kosugi+Maru&display=swap');
-
   @font-face {
     font-family: 'Seolnong';
     src: url('./Seolnong.woff2') format('woff2'),
@@ -19,14 +17,15 @@
   }
 
   :root {
-    --bg: #fafafa;
-    --surface: #ffffff;
-    --ink: #111111;
-    --muted: #6e6e73;
-    --line: #e5e5ea;
+    --bg: #f6f5f2;
+    --card: #ffffff;
+    --ink: #1a1a1a;
+    --muted: #6e6d69;
+    --line: #e2e0da;
     --accent: #1d4e89;
+    --accent-bg: #eef4fb;
     --danger: #d32f2f;
-    --font-main: 'Arimo', 'Kosugi Maru', 'Seolnong', -apple-system, sans-serif;
+    --font-main: 'Seolnong', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
   * {
@@ -36,7 +35,7 @@
 
   body {
     margin: 0;
-    padding: 32px 16px 80px;
+    padding: 36px 18px 80px;
     background-color: var(--bg);
     font-family: var(--font-main);
     color: var(--ink);
@@ -44,13 +43,13 @@
     justify-content: center;
   }
 
-  button, input, select {
+  button, input, select, textarea {
     font-family: var(--font-main);
   }
 
-  .container {
+  .wrap {
     width: 100%;
-    max-width: 560px;
+    max-width: 680px;
   }
 
   /* Header */
@@ -68,13 +67,14 @@
     margin: 0 0 4px;
     font-size: 24px;
     font-weight: 700;
-    letter-spacing: -0.5px;
+    letter-spacing: 1px;
   }
 
   .title-area p {
     margin: 0;
     font-size: 12.5px;
     color: var(--muted);
+    letter-spacing: 0.5px;
   }
 
   .add-btn {
@@ -82,36 +82,29 @@
     color: #fff;
     border: none;
     padding: 9px 14px;
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 700;
+    border-radius: 6px;
     cursor: pointer;
-    border-radius: 4px;
     flex-shrink: 0;
-  }
-
-  .add-btn:active {
-    opacity: 0.85;
   }
 
   /* Filter Pills */
   .filter-bar {
     display: flex;
     gap: 6px;
-    margin-bottom: 18px;
-    overflow-x: auto;
-    padding-bottom: 4px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
   }
 
   .filter-btn {
-    background: var(--surface);
+    background: var(--card);
     border: 1px solid var(--line);
     color: var(--muted);
-    padding: 6px 12px;
+    padding: 5px 12px;
     font-size: 12px;
-    font-weight: 500;
     border-radius: 20px;
     cursor: pointer;
-    white-space: nowrap;
     transition: all 0.15s;
   }
 
@@ -122,37 +115,36 @@
     font-weight: 700;
   }
 
-  /* Grid Cards */
+  /* Card Grid */
   .grid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  @media (min-width: 480px) {
-    .grid {
-      grid-template-columns: 1fr 1fr;
-    }
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 14px;
   }
 
   .card {
-    background: var(--surface);
+    background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 16px;
+    border-radius: 10px;
+    padding: 18px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    text-decoration: none;
-    color: inherit;
-    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
     position: relative;
   }
 
   .card:hover {
-    border-color: var(--ink);
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    border-color: #bcb9b0;
+  }
+
+  .card-link-area {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    flex: 1;
   }
 
   .card-top {
@@ -162,51 +154,58 @@
     margin-bottom: 10px;
   }
 
-  .cat-tag {
-    font-size: 10.5px;
+  .tag {
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.5px;
     color: var(--accent);
-    background: rgba(29, 78, 137, 0.08);
-    padding: 2px 7px;
-    border-radius: 3px;
+    background: var(--accent-bg);
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
   }
 
-  .arrow-icon {
-    font-size: 14px;
+  .arrow {
+    font-size: 15px;
     color: var(--muted);
   }
 
   .card-title {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
     margin: 0 0 6px;
-    line-height: 1.3;
+    line-height: 1.35;
   }
 
   .card-desc {
-    font-size: 12.5px;
+    font-size: 13px;
     color: var(--muted);
-    margin: 0 0 14px;
+    margin: 0;
     line-height: 1.45;
-    word-break: keep-all;
   }
 
   .card-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 1px solid var(--line);
-    padding-top: 8px;
-    font-size: 11px;
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--line);
+    font-size: 11.5px;
     color: var(--muted);
+  }
+
+  .url-preview {
+    max-width: 190px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .edit-link-btn {
     background: none;
     border: none;
     color: var(--muted);
-    font-size: 11px;
+    font-size: 12px;
     cursor: pointer;
     padding: 2px 4px;
     text-decoration: underline;
@@ -216,37 +215,79 @@
     color: var(--ink);
   }
 
-  /* Footer Util */
+  /* Admin Mode Visibility Control */
+  .admin-only {
+    display: none !important;
+  }
+
+  body.is-admin .admin-only {
+    display: inline-block !important;
+  }
+
+  body.is-admin .admin-only-flex {
+    display: flex !important;
+  }
+
+  /* Bottom Utility */
   .footer-bar {
-    margin-top: 28px;
-    padding-top: 14px;
+    margin-top: 32px;
+    padding-top: 16px;
     border-top: 1px solid var(--line);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 11.5px;
+    font-size: 12px;
     color: var(--muted);
-  }
-
-  .util-group {
-    display: flex;
+    flex-wrap: wrap;
     gap: 8px;
   }
 
-  .text-btn {
-    background: none;
+  .footer-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .util-btns {
+    display: none;
+    gap: 6px;
+  }
+
+  .util-btn {
+    background: var(--card);
     border: 1px solid var(--line);
-    background: var(--surface);
     color: var(--muted);
-    padding: 5px 9px;
-    border-radius: 4px;
-    font-size: 11px;
+    padding: 5px 10px;
+    font-size: 11.5px;
+    border-radius: 5px;
     cursor: pointer;
   }
 
-  .text-btn:hover {
+  .util-btn:hover {
     border-color: var(--ink);
     color: var(--ink);
+  }
+
+  .admin-toggle-btn {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    padding: 5px 10px;
+    font-size: 11.5px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .admin-toggle-btn:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+
+  body.is-admin .admin-toggle-btn {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
   }
 
   /* Modal */
@@ -266,20 +307,18 @@
   }
 
   .modal {
-    background: var(--surface);
+    background: var(--card);
     width: 100%;
-    max-width: 380px;
-    padding: 20px;
-    border-radius: 8px;
+    max-width: 390px;
+    padding: 22px;
+    border-radius: 12px;
     border: 1px solid var(--ink);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
   }
 
   .modal h3 {
-    margin: 0 0 14px;
-    font-size: 16px;
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 8px;
+    margin: 0 0 16px;
+    font-size: 17px;
   }
 
   .form-group {
@@ -288,20 +327,21 @@
 
   .form-group label {
     display: block;
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 700;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
   }
 
   .form-group input, .form-group select {
     width: 100%;
-    padding: 8px 10px;
-    border: 1px solid var(--line);
-    border-radius: 4px;
+    padding: 9px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
     font-size: 13.5px;
+    background: #fff;
   }
 
-  .form-group input:focus, .form-group select:focus {
+  .form-group input:focus {
     outline: none;
     border-color: var(--ink);
   }
@@ -309,132 +349,154 @@
   .modal-btns {
     display: flex;
     gap: 8px;
-    margin-top: 16px;
+    margin-top: 18px;
   }
 
-  .btn-primary {
+  .btn-save {
     flex: 2;
     background: var(--ink);
     color: #fff;
     border: none;
     padding: 10px;
-    border-radius: 4px;
+    border-radius: 6px;
     font-weight: 700;
     cursor: pointer;
   }
 
   .btn-cancel {
     flex: 1;
-    background: #fff;
-    border: 1px solid var(--line);
+    background: #f3f2ee;
+    border: none;
     padding: 10px;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
   }
 
-  .btn-delete {
+  .btn-del {
     background: var(--danger);
     color: #fff;
     border: none;
-    padding: 10px;
-    border-radius: 4px;
+    padding: 10px 12px;
+    border-radius: 6px;
     cursor: pointer;
   }
 </style>
 </head>
 <body>
 
-<div class="container">
+<div class="wrap">
   <header class="header">
     <div class="title-area">
       <h1>MY ARCHIVE</h1>
       <p>OSAKA 2026 · PERSONAL WEB INDEX</p>
     </div>
-    <button type="button" class="add-btn" onclick="openModal()">+ 새 링크</button>
+    <button type="button" class="add-btn admin-only" onclick="openModal()">+ 새 링크</button>
   </header>
 
-  <nav class="filter-bar" id="filter-bar">
-    <button type="button" class="filter-btn active" onclick="setFilter('ALL')">ALL</button>
-    <button type="button" class="filter-btn" onclick="setFilter('PLANNER')">PLANNER</button>
-    <button type="button" class="filter-btn" onclick="setFilter('SHOPPING')">SHOPPING</button>
-    <button type="button" class="filter-btn" onclick="setFilter('ETC')">ETC</button>
-  </nav>
+  <div class="filter-bar" id="filter-bar"></div>
 
-  <main class="grid" id="link-grid"></main>
+  <div class="grid" id="card-grid"></div>
 
   <footer class="footer-bar">
     <span>JP-2026 DIRECTORY</span>
-    <div class="util-group">
-      <button type="button" class="text-btn" onclick="exportLinks()">백업</button>
-      <button type="button" class="text-btn" onclick="document.getElementById('import-file').click()">불러오기</button>
-      <button type="button" class="text-btn" onclick="resetLinks()">초기화</button>
-      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importLinks(event)">
+    <div class="footer-right">
+      <div class="util-btns admin-only-flex">
+        <button type="button" class="util-btn" onclick="exportData()">백업</button>
+        <button type="button" class="util-btn" onclick="document.getElementById('import-input').click()">불러오기</button>
+        <button type="button" class="util-btn" onclick="resetDefault()">초기화</button>
+        <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)">
+      </div>
+      <button type="button" class="admin-toggle-btn" id="admin-toggle-btn" onclick="toggleAdminMode()">🔒 ADMIN</button>
     </div>
   </footer>
 </div>
 
-<!-- Add / Edit Modal -->
+<!-- Add / Edit Link Modal -->
 <div class="modal-backdrop" id="link-modal">
   <div class="modal">
-    <h3 id="modal-title">새 링크 추가</h3>
+    <h3 id="modal-heading">새 링크 추가</h3>
     <div class="form-group">
-      <label>카테고리</label>
-      <select id="edit-cat">
-        <option value="PLANNER">PLANNER</option>
-        <option value="SHOPPING">SHOPPING</option>
-        <option value="ETC">ETC</option>
-      </select>
+      <label>제목</label>
+      <input type="text" id="in-title" placeholder="예: 커플 오사카 플래너">
     </div>
     <div class="form-group">
-      <label>사이트 제목</label>
-      <input type="text" id="edit-title" placeholder="예: 오사카 커플 플래너">
+      <label>카테고리 태그</label>
+      <input type="text" id="in-tag" placeholder="예: PLANNER, SHOPPING, MAP">
     </div>
     <div class="form-group">
-      <label>설명 (한 줄 메모)</label>
-      <input type="text" id="edit-desc" placeholder="예: 예약 도장 & 일정 타임라인 (시트 연동)">
+      <label>링크 주소 (상대경로 또는 https://...)</label>
+      <input type="text" id="in-url" placeholder="예: ./plan/ 또는 https://...">
     </div>
     <div class="form-group">
-      <label>링크 주소 (상대 경로 또는 https://...)</label>
-      <input type="text" id="edit-url" placeholder="./plan/ 또는 https://...">
+      <label>한 줄 설명</label>
+      <input type="text" id="in-desc" placeholder="예: 예약 스탬프 및 일자별 일정 타임라인">
     </div>
     <div class="modal-btns">
-      <button type="button" class="btn-delete" id="del-btn" onclick="deleteLink()" style="display:none;">삭제</button>
+      <button type="button" class="btn-del" id="btn-del" onclick="deleteLink()" style="display:none;">삭제</button>
       <button type="button" class="btn-cancel" onclick="closeModal()">취소</button>
-      <button type="button" class="btn-primary" onclick="saveLink()">저장</button>
+      <button type="button" class="btn-save" onclick="saveLink()">저장</button>
     </div>
   </div>
 </div>
 
 <script>
-  const STORAGE_KEY = "my_archive_links_osaka_v1";
+  const ADMIN_PW = "0000";
+  const ADMIN_SESSION_KEY = "osaka_hub_admin_unlocked_v1";
+  const STORAGE_KEY = "hailey_web_archive_v2";
 
   const defaultLinks = [
     {
-      id: "l1",
-      cat: "PLANNER",
+      id: "link_planner",
+      tag: "PLANNER",
       title: "커플 오사카 플래너",
-      desc: "예약 스탬프 & 날짜별 일정 타임라인 (구글 시트 공동 동기화)",
-      url: "./plan/"
+      url: "./plan/",
+      desc: "예약 스탬프 & 날짜별 일정 타임라인 (구글 시트 공동 동기화)"
     },
     {
-      id: "l2",
-      cat: "SHOPPING",
+      id: "link_my_receipt",
+      tag: "SHOPPING",
       title: "내 전용 쇼핑 · 준비물",
-      desc: "면세 계산기, 품목 사진, 캐리어 체크리스트 (내 시트 연동)",
-      url: "./my-receipt/"
+      url: "./my-receipt/",
+      desc: "면세 계산기, 품목 사진, 캐리어 체크리스트 (내 시트 연동)"
     },
     {
-      id: "l3",
-      cat: "SHOPPING",
+      id: "link_bf_receipt",
+      tag: "SHOPPING",
       title: "남자친구 전용 쇼핑 · 준비물",
-      desc: "남친 구매 리스트 & 개인 준비물 영수증 (시트 연동)",
-      url: "./bf-receipt/"
+      url: "./bf-receipt/",
+      desc: "남친 구매 리스트 & 개인 준비물 영수증 (시트 연동)"
     }
   ];
 
   let links = loadLinks();
   let currentFilter = "ALL";
   let editingId = null;
+  let isAdmin = sessionStorage.getItem(ADMIN_SESSION_KEY) === "true";
+
+  function applyAdminState() {
+    document.body.classList.toggle("is-admin", isAdmin);
+    const btn = document.getElementById("admin-toggle-btn");
+    btn.textContent = isAdmin ? "🔓 LOCK" : "🔒 ADMIN";
+  }
+
+  function toggleAdminMode() {
+    if (isAdmin) {
+      isAdmin = false;
+      sessionStorage.removeItem(ADMIN_SESSION_KEY);
+      applyAdminState();
+      return;
+    }
+
+    const input = prompt("관리자 비밀번호를 입력하세요:");
+    if (input === null) return;
+    if (input === ADMIN_PW) {
+      isAdmin = true;
+      sessionStorage.setItem(ADMIN_SESSION_KEY, "true");
+      applyAdminState();
+    } else {
+      alert("비밀번호가 올바르지 않습니다.");
+    }
+  }
 
   function loadLinks() {
     try {
@@ -444,35 +506,37 @@
     return JSON.parse(JSON.stringify(defaultLinks));
   }
 
-  function persistLinks() {
+  function saveToStorage() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(links));
   }
 
-  function setFilter(cat) {
-    currentFilter = cat;
-    document.querySelectorAll(".filter-btn").forEach(btn => {
-      btn.classList.toggle("active", btn.textContent === cat);
-    });
+  function resetDefault() {
+    if (!isAdmin) return;
+    if (!confirm("기본 링크 목록으로 되돌릴까요?")) return;
+    links = JSON.parse(JSON.stringify(defaultLinks));
+    saveToStorage();
+    currentFilter = "ALL";
     render();
   }
 
   function openModal(id = null) {
+    if (!isAdmin) return;
     editingId = id;
     if (id) {
       const item = links.find(l => l.id === id);
-      document.getElementById("modal-title").textContent = "링크 수정";
-      document.getElementById("edit-cat").value = item.cat;
-      document.getElementById("edit-title").value = item.title;
-      document.getElementById("edit-desc").value = item.desc;
-      document.getElementById("edit-url").value = item.url;
-      document.getElementById("del-btn").style.display = "block";
+      document.getElementById("modal-heading").textContent = "링크 수정";
+      document.getElementById("in-title").value = item.title;
+      document.getElementById("in-tag").value = item.tag;
+      document.getElementById("in-url").value = item.url;
+      document.getElementById("in-desc").value = item.desc;
+      document.getElementById("btn-del").style.display = "block";
     } else {
-      document.getElementById("modal-title").textContent = "새 링크 추가";
-      document.getElementById("edit-cat").value = currentFilter === "ALL" ? "PLANNER" : currentFilter;
-      document.getElementById("edit-title").value = "";
-      document.getElementById("edit-desc").value = "";
-      document.getElementById("edit-url").value = "";
-      document.getElementById("del-btn").style.display = "none";
+      document.getElementById("modal-heading").textContent = "새 링크 추가";
+      document.getElementById("in-title").value = "";
+      document.getElementById("in-tag").value = "ETC";
+      document.getElementById("in-url").value = "";
+      document.getElementById("in-desc").value = "";
+      document.getElementById("btn-del").style.display = "none";
     }
     document.getElementById("link-modal").classList.add("open");
   }
@@ -483,112 +547,117 @@
   }
 
   function saveLink() {
-    const cat = document.getElementById("edit-cat").value;
-    const title = document.getElementById("edit-title").value.trim();
-    const desc = document.getElementById("edit-desc").value.trim();
-    let url = document.getElementById("edit-url").value.trim();
+    if (!isAdmin) return;
+    const title = document.getElementById("in-title").value.trim();
+    const tag = (document.getElementById("in-tag").value.trim() || "ETC").toUpperCase();
+    const url = document.getElementById("in-url").value.trim();
+    const desc = document.getElementById("in-desc").value.trim();
 
     if (!title || !url) {
       alert("제목과 링크 주소를 입력해 주세요.");
       return;
     }
 
-    if (!url.startsWith("./") && !url.startsWith("/") && !url.startsWith("http://") && !url.startsWith("https://")) {
-      url = "https://" + url;
-    }
-
     if (editingId) {
       const item = links.find(l => l.id === editingId);
-      item.cat = cat;
       item.title = title;
-      item.desc = desc;
+      item.tag = tag;
       item.url = url;
+      item.desc = desc;
     } else {
       links.push({
         id: "link_" + Date.now(),
-        cat,
         title,
-        desc,
-        url
+        tag,
+        url,
+        desc
       });
     }
-    persistLinks();
+
+    saveToStorage();
     closeModal();
     render();
   }
 
   function deleteLink() {
-    if (!editingId) return;
-    if (!confirm("이 링크를 삭제할까요?")) return;
+    if (!isAdmin || !editingId) return;
+    if (!confirm("이 링크 카드를 삭제할까요?")) return;
     links = links.filter(l => l.id !== editingId);
-    persistLinks();
+    saveToStorage();
     closeModal();
     render();
   }
 
-  function resetLinks() {
-    if (!confirm("기본 3개 링크(플래너, 내 영수증, 남친 영수증)로 초기화할까요?")) return;
-    links = JSON.parse(JSON.stringify(defaultLinks));
-    persistLinks();
+  function setFilter(tag) {
+    currentFilter = tag;
     render();
   }
 
-  function exportLinks() {
+  function exportData() {
+    if (!isAdmin) return;
     const blob = new Blob([JSON.stringify(links, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
+    a.href = url;
     a.download = "my-archive-backup-" + new Date().toISOString().slice(0, 10) + ".json";
     a.click();
+    URL.revokeObjectURL(url);
   }
 
-  function importLinks(e) {
-    const file = e.target.files[0];
+  function importData(event) {
+    if (!isAdmin) return;
+    const file = event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = ev => {
+    reader.onload = function(e) {
       try {
-        const parsed = JSON.parse(ev.target.result);
+        const parsed = JSON.parse(e.target.result);
         if (Array.isArray(parsed)) {
           links = parsed;
-          persistLinks();
+          saveToStorage();
+          currentFilter = "ALL";
           render();
-          alert("링크 목록을 불러왔습니다.");
+          alert("백업 목록을 불러왔습니다.");
         }
       } catch (err) {
         alert("올바른 백업 파일이 아닙니다.");
       }
     };
     reader.readAsText(file);
-    e.target.value = "";
+    event.target.value = "";
   }
 
   function render() {
-    const grid = document.getElementById("link-grid");
-    const filtered = currentFilter === "ALL" ? links : links.filter(l => l.cat === currentFilter);
+    const tags = ["ALL", ...new Set(links.map(l => l.tag))];
+    if (!tags.includes(currentFilter)) currentFilter = "ALL";
 
-    if (filtered.length === 0) {
-      grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:36px 12px; color:var(--muted); font-size:13px; border:1px dashed var(--line); border-radius:8px;">등록된 링크가 없습니다. 우측 상단 <strong>+ 새 링크</strong>로 추가해 주세요.</div>';
-      return;
-    }
+    const filterBar = document.getElementById("filter-bar");
+    filterBar.innerHTML = tags.map(t =>
+      '<button type="button" class="filter-btn ' + (currentFilter === t ? 'active' : '') + '" onclick="setFilter(\'' + t + '\')">' + t + '</button>'
+    ).join("");
 
-    grid.innerHTML = filtered.map(item => `
-      <a class="card" href="${item.url}">
-        <div>
-          <div class="card-top">
-            <span class="cat-tag">${item.cat}</span>
-            <span class="arrow-icon">↗</span>
-          </div>
-          <h2 class="card-title">${item.title}</h2>
-          <p class="card-desc">${item.desc || "&nbsp;"}</p>
-        </div>
-        <div class="card-footer">
-          <span>${item.url}</span>
-          <button type="button" class="edit-link-btn" onclick="event.preventDefault(); event.stopPropagation(); openModal('${item.id}')">수정</button>
-        </div>
-      </a>
-    `).join("");
+    const filtered = currentFilter === "ALL" ? links : links.filter(l => l.tag === currentFilter);
+    const grid = document.getElementById("card-grid");
+
+    grid.innerHTML = filtered.map(item =>
+      '<div class="card">' +
+        '<a class="card-link-area" href="' + item.url + '">' +
+          '<div class="card-top">' +
+            '<span class="tag">' + item.tag + '</span>' +
+            '<span class="arrow">↗</span>' +
+          '</div>' +
+          '<div class="card-title">' + item.title + '</div>' +
+          '<p class="card-desc">' + (item.desc || '') + '</p>' +
+        '</a>' +
+        '<div class="card-footer">' +
+          '<span class="url-preview">' + item.url + '</span>' +
+          '<button type="button" class="edit-link-btn admin-only" onclick="openModal(\'' + item.id + '\')">수정</button>' +
+        '</div>' +
+      '</div>'
+    ).join("");
   }
 
+  applyAdminState();
   render();
 </script>
 </body>
