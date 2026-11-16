@@ -988,6 +988,7 @@ function doPost(e) {
 <script>
   const STORAGE_KEY = "osaka_receipt_hailey_v1";
   const SHEET_URL_KEY = "osaka_receipt_hailey_sheet_url_v1";
+  const DEFAULT_SHEET_URL = "https://script.google.com/macros/s/AKfycbwCMWcQ8UcxnzMUdFiNhvzxMaoEnOTJyK9XMUERqGTiY3rFDwpVK_YFEKFGZep5DI_K/exec";
 
   const initialData = {
     rate: 905,
@@ -1009,7 +1010,7 @@ function doPost(e) {
   }
 
   function getSheetUrl() {
-    return localStorage.getItem(SHEET_URL_KEY) || "";
+    return localStorage.getItem(SHEET_URL_KEY) || DEFAULT_SHEET_URL;
   }
 
   function setSyncUI(state, text) {

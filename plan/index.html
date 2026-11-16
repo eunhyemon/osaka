@@ -889,6 +889,7 @@ function doPost(e) {
 <script>
   const STORAGE_KEY = "osaka_tabi_note_v1";
   const SHEET_URL_KEY = "osaka_tabi_sheet_url_v1";
+  const DEFAULT_SHEET_URL = "https://script.google.com/macros/s/AKfycbwq2GOYBQZdepR0LFgNV8wJVJncIj-RNPNPatfY1NQ-LbsLf4qvlhMpW8ZKbE0EmB64/exec";
 
   const initialData = {
     activeTab: "booking",
@@ -924,7 +925,7 @@ function doPost(e) {
   }
 
   function getSheetUrl() {
-    return localStorage.getItem(SHEET_URL_KEY) || "";
+    return localStorage.getItem(SHEET_URL_KEY) || DEFAULT_SHEET_URL;
   }
 
   function setSyncUI(state, text) {
