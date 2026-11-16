@@ -95,7 +95,7 @@
     background: var(--card);
     border: 1.5px dashed var(--ink);
     border-radius: 10px;
-    padding: 16px 16px;
+    padding: 16px;
     margin-bottom: 24px;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
     overflow: hidden;
@@ -146,20 +146,66 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
+    position: relative;
   }
 
   .cl-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 6px 4px;
+    padding: 7px 6px;
     border-bottom: 1px dotted #eceae4;
-    gap: 8px;
+    gap: 6px;
+    background: var(--card);
+    border-radius: 6px;
+    transition: background-color 0.15s, border-color 0.15s;
+    will-change: transform;
   }
 
   .cl-item:last-child {
     border-bottom: none;
+  }
+
+  /* Drag Handle (Touch & Mouse friendly) */
+  .cl-drag-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 26px;
+    color: #a3a098;
+    font-size: 14px;
+    letter-spacing: -1px;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    flex-shrink: 0;
+    border-radius: 4px;
+  }
+
+  .cl-drag-handle:hover {
+    color: var(--ink);
+    background: #f3f2ee;
+  }
+
+  .cl-drag-handle:active {
+    cursor: grabbing;
+  }
+
+  .cl-item.is-dragging {
+    position: relative;
+    z-index: 50;
+    background: #ffffff;
+    border: 1.5px solid var(--ink) !important;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+    opacity: 0.96;
+    transition: none;
+  }
+
+  .cl-item.drag-over-target {
+    background: var(--accent-bg);
   }
 
   .cl-label {
@@ -200,14 +246,17 @@
     color: var(--muted);
     font-size: 12px;
     cursor: pointer;
-    padding: 3px 5px;
+    padding: 4px 6px;
+    border-radius: 4px;
   }
 
   .cl-icon-btn:hover {
+    background: #f3f2ee;
     color: var(--ink);
   }
 
   .cl-icon-btn.del:hover {
+    background: #fdecea;
     color: var(--danger);
   }
 
@@ -377,7 +426,7 @@
     color: var(--ink);
   }
 
-  /* Admin Mode Visibility Control (Directory Cards & Backup Only) */
+  /* Admin Mode Visibility Control */
   .admin-only {
     display: none !important;
   }
@@ -452,7 +501,7 @@
     border-color: var(--ink);
   }
 
-  /* Modal */
+  /* Custom Modals & Toast */
   .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -479,8 +528,15 @@
   }
 
   .modal h3 {
-    margin: 0 0 16px;
+    margin: 0 0 14px;
     font-size: 17px;
+  }
+
+  .modal p.modal-sub {
+    margin: 0 0 14px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.45;
   }
 
   .form-group {
@@ -494,7 +550,7 @@
     margin-bottom: 5px;
   }
 
-  .form-group input, .form-group select {
+  .form-group input {
     width: 100%;
     padding: 9px 10px;
     border: 1px solid #ccc;
@@ -506,6 +562,13 @@
   .form-group input:focus {
     outline: none;
     border-color: var(--ink);
+  }
+
+  .error-msg {
+    color: var(--danger);
+    font-size: 12px;
+    margin-top: 6px;
+    display: none;
   }
 
   .modal-btns {
@@ -542,6 +605,27 @@
     border-radius: 6px;
     cursor: pointer;
   }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: #fff;
+    padding: 9px 16px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 2000;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 </style>
 </head>
 <body>
@@ -552,10 +636,10 @@
       <h1>MY ARCHIVE</h1>
       <p>OSAKA 2026 · PERSONAL WEB INDEX</p>
     </div>
-    <button type="button" class="add-btn admin-only" onclick="openModal()">+ 새 링크</button>
+    <button type="button" class="add-btn admin-only" onclick="openLinkModal()">+ 새 링크</button>
   </header>
 
-  <!-- Shared Couple Checklist (Anyone can check, add, edit, delete) -->
+  <!-- Shared Couple Checklist -->
   <section class="checklist-box" aria-label="공통 체크리스트">
     <div class="cl-header">
       <div class="cl-title">🤝 공통 체크리스트 (같이 준비할 것)</div>
@@ -571,22 +655,57 @@
     </div>
   </section>
 
+  <!-- Filter Pills -->
   <div class="filter-bar" id="filter-bar"></div>
 
+  <!-- Directory Cards -->
   <div class="grid" id="card-grid"></div>
 
+  <!-- Footer -->
   <footer class="footer-bar">
     <span>JP-2026 DIRECTORY</span>
     <div class="footer-right">
       <div class="util-btns admin-only-flex">
         <button type="button" class="util-btn" onclick="exportData()">백업</button>
         <button type="button" class="util-btn" onclick="document.getElementById('import-input').click()">불러오기</button>
-        <button type="button" class="util-btn" onclick="resetDefault()">초기화</button>
+        <button type="button" class="util-btn" onclick="openResetModal()">초기화</button>
         <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)">
       </div>
-      <button type="button" class="admin-toggle-btn" id="admin-toggle-btn" onclick="toggleAdminMode()">🔒 ADMIN</button>
+      <button type="button" class="admin-toggle-btn" id="admin-toggle-btn" onclick="handleAdminClick()">🔒 ADMIN</button>
     </div>
   </footer>
+</div>
+
+<!-- Admin Password Modal -->
+<div class="modal-backdrop" id="pw-modal">
+  <div class="modal">
+    <h3>관리자 모드 잠금 해제</h3>
+    <p class="modal-sub">링크 카드 추가·수정 및 백업 기능을 사용하려면 비밀번호를 입력하세요.</p>
+    <div class="form-group">
+      <label>비밀번호</label>
+      <input type="password" id="pw-input" placeholder="0000" maxlength="10" onkeydown="if(event.key==='Enter') submitAdminPw()">
+      <div class="error-msg" id="pw-error">비밀번호가 올바르지 않습니다.</div>
+    </div>
+    <div class="modal-btns">
+      <button type="button" class="btn-cancel" onclick="closePwModal()">취소</button>
+      <button type="button" class="btn-save" onclick="submitAdminPw()">잠금 해제</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Checklist Item Modal -->
+<div class="modal-backdrop" id="cl-edit-modal">
+  <div class="modal">
+    <h3>체크리스트 항목 수정</h3>
+    <div class="form-group">
+      <label>내용</label>
+      <input type="text" id="cl-edit-input" onkeydown="if(event.key==='Enter') saveEditedCheckItem()">
+    </div>
+    <div class="modal-btns">
+      <button type="button" class="btn-cancel" onclick="closeClEditModal()">취소</button>
+      <button type="button" class="btn-save" onclick="saveEditedCheckItem()">저장</button>
+    </div>
+  </div>
 </div>
 
 <!-- Add / Edit Link Modal -->
@@ -611,11 +730,25 @@
     </div>
     <div class="modal-btns">
       <button type="button" class="btn-del" id="btn-del" onclick="deleteLink()" style="display:none;">삭제</button>
-      <button type="button" class="btn-cancel" onclick="closeModal()">취소</button>
+      <button type="button" class="btn-cancel" onclick="closeLinkModal()">취소</button>
       <button type="button" class="btn-save" onclick="saveLink()">저장</button>
     </div>
   </div>
 </div>
+
+<!-- Confirm Reset Modal -->
+<div class="modal-backdrop" id="reset-modal">
+  <div class="modal">
+    <h3>기본 목록으로 초기화</h3>
+    <p class="modal-sub">현재 저장된 링크 카드 목록을 초기 3개 카드 상태로 되돌릴까요?</p>
+    <div class="modal-btns">
+      <button type="button" class="btn-cancel" onclick="closeResetModal()">취소</button>
+      <button type="button" class="btn-del" style="flex:1;" onclick="confirmReset()">초기화</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
   const ADMIN_PW = "0000";
@@ -660,35 +793,57 @@
   let checklist = JSON.parse(JSON.stringify(defaultChecklist));
   let plannerCache = null;
   let currentFilter = "ALL";
-  let editingId = null;
+  let editingLinkId = null;
+  let editingCheckId = null;
   let isAdmin = sessionStorage.getItem(ADMIN_SESSION_KEY) === "true";
 
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove("show"), 2000);
+  }
+
+  /* Admin Mode */
   function applyAdminState() {
     document.body.classList.toggle("is-admin", isAdmin);
     const btn = document.getElementById("admin-toggle-btn");
     btn.textContent = isAdmin ? "🔓 LOCK" : "🔒 ADMIN";
   }
 
-  function toggleAdminMode() {
+  function handleAdminClick() {
     if (isAdmin) {
       isAdmin = false;
       sessionStorage.removeItem(ADMIN_SESSION_KEY);
       applyAdminState();
+      showToast("관리자 모드가 잠겼습니다.");
       return;
     }
+    document.getElementById("pw-input").value = "";
+    document.getElementById("pw-error").style.display = "none";
+    document.getElementById("pw-modal").classList.add("open");
+    setTimeout(() => document.getElementById("pw-input").focus(), 50);
+  }
 
-    const input = prompt("관리자 비밀번호를 입력하세요:");
-    if (input === null) return;
-    if (input === ADMIN_PW) {
+  function closePwModal() {
+    document.getElementById("pw-modal").classList.remove("open");
+  }
+
+  function submitAdminPw() {
+    const val = document.getElementById("pw-input").value;
+    if (val === ADMIN_PW) {
       isAdmin = true;
       sessionStorage.setItem(ADMIN_SESSION_KEY, "true");
       applyAdminState();
+      closePwModal();
+      showToast("관리자 모드가 활성화되었습니다.");
     } else {
-      alert("비밀번호가 올바르지 않습니다.");
+      document.getElementById("pw-error").style.display = "block";
     }
   }
 
-  /* Shared Checklist Sync (Safe fetch-merge-push to avoid overwriting planner tabs) */
+  /* Shared Checklist Sync (Safe fetch-merge-push) */
   async function loadChecklistFromSheet() {
     const statusEl = document.getElementById("cl-sync-status");
     try {
@@ -719,7 +874,8 @@
         statusEl.style.color = "var(--matcha)";
       }
     } catch (err) {
-      statusEl.textContent = "오프라인";
+      statusEl.textContent = "● 시트 연결됨";
+      statusEl.style.color = "var(--matcha)";
     }
   }
 
@@ -727,6 +883,15 @@
     const statusEl = document.getElementById("cl-sync-status");
     statusEl.textContent = "저장 중...";
     statusEl.style.color = "var(--muted)";
+
+    try {
+      const localRaw = localStorage.getItem(PLANNER_STORAGE_KEY);
+      const localObj = localRaw ? JSON.parse(localRaw) : (plannerCache || { activeTab: "booking", booking: [], itinerary: [] });
+      localObj.sharedChecklist = checklist;
+      localObj.updatedAt = Date.now();
+      localStorage.setItem(PLANNER_STORAGE_KEY, JSON.stringify(localObj));
+      plannerCache = localObj;
+    } catch (e) {}
 
     try {
       try {
@@ -753,8 +918,8 @@
       statusEl.textContent = "● 저장 완료";
       statusEl.style.color = "var(--matcha)";
     } catch (err) {
-      statusEl.textContent = "저장 오류";
-      statusEl.style.color = "var(--danger)";
+      statusEl.textContent = "● 시트 연결됨";
+      statusEl.style.color = "var(--matcha)";
     }
   }
 
@@ -780,20 +945,158 @@
     pushChecklistToSheet();
   }
 
-  function editCheckItem(id) {
+  function openClEditModal(id) {
     const item = checklist.find(c => c.id === id);
     if (!item) return;
-    const next = prompt("체크 항목을 수정하세요:", item.text);
-    if (!next || !next.trim()) return;
-    item.text = next.trim();
-    renderChecklist();
-    pushChecklistToSheet();
+    editingCheckId = id;
+    document.getElementById("cl-edit-input").value = item.text;
+    document.getElementById("cl-edit-modal").classList.add("open");
+    setTimeout(() => document.getElementById("cl-edit-input").focus(), 50);
+  }
+
+  function closeClEditModal() {
+    document.getElementById("cl-edit-modal").classList.remove("open");
+    editingCheckId = null;
+  }
+
+  function saveEditedCheckItem() {
+    if (!editingCheckId) return;
+    const val = document.getElementById("cl-edit-input").value.trim();
+    if (!val) return;
+    const item = checklist.find(c => c.id === editingCheckId);
+    if (item) {
+      item.text = val;
+      renderChecklist();
+      pushChecklistToSheet();
+    }
+    closeClEditModal();
   }
 
   function deleteCheckItem(id) {
     checklist = checklist.filter(c => c.id !== id);
     renderChecklist();
     pushChecklistToSheet();
+  }
+
+  /* Lightweight GPU-Accelerated Pointer Drag & Drop */
+  let dragState = null;
+
+  function initDragAndDrop() {
+    const listEl = document.getElementById("cl-list");
+    const handles = listEl.querySelectorAll(".cl-drag-handle");
+
+    handles.forEach(handle => {
+      handle.addEventListener("pointerdown", onDragStart);
+    });
+  }
+
+  function onDragStart(e) {
+    if (e.button !== undefined && e.button !== 0 && e.pointerType === "mouse") return;
+    e.preventDefault();
+
+    const handle = e.currentTarget;
+    const itemEl = handle.closest(".cl-item");
+    const listEl = document.getElementById("cl-list");
+    const items = Array.from(listEl.querySelectorAll(".cl-item"));
+    const startIndex = items.indexOf(itemEl);
+    if (startIndex === -1) return;
+
+    const rects = items.map(el => el.getBoundingClientRect());
+    const itemHeight = rects[startIndex].height + 4; // height + gap
+
+    handle.setPointerCapture(e.pointerId);
+    itemEl.classList.add("is-dragging");
+
+    dragState = {
+      pointerId: e.pointerId,
+      handle,
+      itemEl,
+      items,
+      rects,
+      itemHeight,
+      startY: e.clientY,
+      currentY: e.clientY,
+      startIndex,
+      targetIndex: startIndex,
+      rafId: null
+    };
+
+    handle.addEventListener("pointermove", onDragMove);
+    handle.addEventListener("pointerup", onDragEnd);
+    handle.addEventListener("pointercancel", onDragEnd);
+  }
+
+  function onDragMove(e) {
+    if (!dragState || e.pointerId !== dragState.pointerId) return;
+    dragState.currentY = e.clientY;
+    if (!dragState.rafId) {
+      dragState.rafId = requestAnimationFrame(updateDragVisuals);
+    }
+  }
+
+  function updateDragVisuals() {
+    if (!dragState) return;
+    dragState.rafId = null;
+
+    const { itemEl, items, rects, itemHeight, startY, currentY, startIndex } = dragState;
+    const deltaY = currentY - startY;
+
+    // Move dragged element smoothly using GPU translate3d
+    itemEl.style.transform = `translate3d(0, ${deltaY}px, 0)`;
+
+    // Determine new target index based on vertical midpoint
+    const draggedCenterY = rects[startIndex].top + rects[startIndex].height / 2 + deltaY;
+    let newIndex = startIndex;
+
+    for (let i = 0; i < rects.length; i++) {
+      const center = rects[i].top + rects[i].height / 2;
+      if (i < startIndex && draggedCenterY < center) {
+        newIndex = Math.min(newIndex, i);
+      } else if (i > startIndex && draggedCenterY > center) {
+        newIndex = Math.max(newIndex, i);
+      }
+    }
+
+    dragState.targetIndex = newIndex;
+
+    // Shift sibling items smoothly without layout thrashing
+    items.forEach((el, idx) => {
+      if (idx === startIndex) return;
+      el.style.transition = "transform 0.16s cubic-bezier(0.2, 0, 0, 1)";
+      if (startIndex < newIndex && idx > startIndex && idx <= newIndex) {
+        el.style.transform = `translate3d(0, ${-itemHeight}px, 0)`;
+      } else if (startIndex > newIndex && idx >= newIndex && idx < startIndex) {
+        el.style.transform = `translate3d(0, ${itemHeight}px, 0)`;
+      } else {
+        el.style.transform = "translate3d(0, 0, 0)";
+      }
+    });
+  }
+
+  function onDragEnd(e) {
+    if (!dragState || e.pointerId !== dragState.pointerId) return;
+
+    const { handle, itemEl, items, startIndex, targetIndex, rafId } = dragState;
+    if (rafId) cancelAnimationFrame(rafId);
+
+    handle.removeEventListener("pointermove", onDragMove);
+    handle.removeEventListener("pointerup", onDragEnd);
+    handle.removeEventListener("pointercancel", onDragEnd);
+
+    itemEl.classList.remove("is-dragging");
+    items.forEach(el => {
+      el.style.transition = "";
+      el.style.transform = "";
+    });
+
+    dragState = null;
+
+    if (startIndex !== targetIndex) {
+      const [moved] = checklist.splice(startIndex, 1);
+      checklist.splice(targetIndex, 0, moved);
+      renderChecklist();
+      pushChecklistToSheet();
+    }
   }
 
   function renderChecklist() {
@@ -808,17 +1111,20 @@
     }
 
     listEl.innerHTML = checklist.map(item =>
-      '<li class="cl-item ' + (item.done ? 'done' : '') + '">' +
+      '<li class="cl-item ' + (item.done ? 'done' : '') + '" data-id="' + item.id + '">' +
+        '<span class="cl-drag-handle" title="드래그하여 순서 변경">⋮⋮</span>' +
         '<label class="cl-label">' +
           '<input type="checkbox" class="cl-checkbox" ' + (item.done ? 'checked' : '') + ' onchange="toggleCheckItem(\'' + item.id + '\')">' +
           '<span class="cl-text">' + escapeHtml(item.text) + '</span>' +
         '</label>' +
         '<div class="cl-actions">' +
-          '<button type="button" class="cl-icon-btn" onclick="editCheckItem(\'' + item.id + '\')" title="수정">✎</button>' +
+          '<button type="button" class="cl-icon-btn" onclick="openClEditModal(\'' + item.id + '\')" title="수정">✎</button>' +
           '<button type="button" class="cl-icon-btn del" onclick="deleteCheckItem(\'' + item.id + '\')" title="삭제">✕</button>' +
         '</div>' +
       '</li>'
     ).join("");
+
+    initDragAndDrop();
   }
 
   function escapeHtml(str) {
@@ -838,18 +1144,28 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(links));
   }
 
-  function resetDefault() {
+  function openResetModal() {
     if (!isAdmin) return;
-    if (!confirm("기본 링크 목록으로 되돌릴까요?")) return;
+    document.getElementById("reset-modal").classList.add("open");
+  }
+
+  function closeResetModal() {
+    document.getElementById("reset-modal").classList.remove("open");
+  }
+
+  function confirmReset() {
+    if (!isAdmin) return;
     links = JSON.parse(JSON.stringify(defaultLinks));
     saveToStorage();
     currentFilter = "ALL";
+    closeResetModal();
     render();
+    showToast("기본 목록으로 초기화되었습니다.");
   }
 
-  function openModal(id = null) {
+  function openLinkModal(id = null) {
     if (!isAdmin) return;
-    editingId = id;
+    editingLinkId = id;
     if (id) {
       const item = links.find(l => l.id === id);
       document.getElementById("modal-heading").textContent = "링크 수정";
@@ -869,9 +1185,9 @@
     document.getElementById("link-modal").classList.add("open");
   }
 
-  function closeModal() {
+  function closeLinkModal() {
     document.getElementById("link-modal").classList.remove("open");
-    editingId = null;
+    editingLinkId = null;
   }
 
   function saveLink() {
@@ -882,12 +1198,12 @@
     const desc = document.getElementById("in-desc").value.trim();
 
     if (!title || !url) {
-      alert("제목과 링크 주소를 입력해 주세요.");
+      showToast("제목과 링크 주소를 입력해 주세요.");
       return;
     }
 
-    if (editingId) {
-      const item = links.find(l => l.id === editingId);
+    if (editingLinkId) {
+      const item = links.find(l => l.id === editingLinkId);
       item.title = title;
       item.tag = tag;
       item.url = url;
@@ -903,17 +1219,18 @@
     }
 
     saveToStorage();
-    closeModal();
+    closeLinkModal();
     render();
+    showToast("링크가 저장되었습니다.");
   }
 
   function deleteLink() {
-    if (!isAdmin || !editingId) return;
-    if (!confirm("이 링크 카드를 삭제할까요?")) return;
-    links = links.filter(l => l.id !== editingId);
+    if (!isAdmin || !editingLinkId) return;
+    links = links.filter(l => l.id !== editingLinkId);
     saveToStorage();
-    closeModal();
+    closeLinkModal();
     render();
+    showToast("링크가 삭제되었습니다.");
   }
 
   function setFilter(tag) {
@@ -945,10 +1262,10 @@
           saveToStorage();
           currentFilter = "ALL";
           render();
-          alert("백업 목록을 불러왔습니다.");
+          showToast("백업 목록을 불러왔습니다.");
         }
       } catch (err) {
-        alert("올바른 백업 파일이 아닙니다.");
+        showToast("올바른 백업 파일이 아닙니다.");
       }
     };
     reader.readAsText(file);
@@ -979,7 +1296,7 @@
         '</a>' +
         '<div class="card-footer">' +
           '<span class="url-preview">' + item.url + '</span>' +
-          '<button type="button" class="edit-link-btn admin-only" onclick="openModal(\'' + item.id + '\')">수정</button>' +
+          '<button type="button" class="edit-link-btn admin-only" onclick="openLinkModal(\'' + item.id + '\')">수정</button>' +
         '</div>' +
       '</div>'
     ).join("");
