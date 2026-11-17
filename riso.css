@@ -1,0 +1,45 @@
+/* Minimal riso treatment. Layout and app behavior remain in each page's stylesheet. */
+:root {
+  --bg: #faf9f5;
+  --surface: #faf9f5;
+  --subtle-bg: #f3f2ec;
+  --ink: #20241f;
+  --line-strong: #20241f;
+  --line: #e3e3da;
+  --riso-green: #16845f;
+  --riso-pink: #dc5086;
+  --riso-yellow: #b7c6a6;
+  --riso-blue: #16845f;
+  --riso-aqua: #16845f;
+  --riso-red: #dc5086;
+}
+body { background-image: url('./assets/paper.svg'); }
+/* Texture is restricted to decorative ink. Labels and controls stay legible. */
+.jp-stamp, .done-stamp, .header-stamp, .circle-stamp {
+  -webkit-mask-image: url('./assets/ink-mask.svg');
+  mask-image: url('./assets/ink-mask.svg');
+  mask-mode: luminance;
+  -webkit-mask-size: 160px 160px;
+  mask-size: 160px 160px;
+  mix-blend-mode: multiply;
+}
+.jp-stamp, .header-stamp { background-color: transparent; }
+.card { border-radius: 3px; background: transparent; }
+.card:hover { transform: translateY(-1px); }
+.tag, .tag.tag-shopping, .tag.tag-etc {
+  background: transparent;
+  border-radius: 0;
+  padding: 2px 0;
+  letter-spacing: .09em;
+}
+.card-footer { border-top-color: var(--line); }
+.riso-swatches span:last-child { display: none; }
+.item-memo, .tl-memo { border-left-color: var(--riso-green); }
+/* Clear keyboard feedback without changing control dimensions. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--riso-green);
+  outline-offset: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+}
