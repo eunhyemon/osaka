@@ -43,3 +43,84 @@ body { background-image: url('./assets/paper.svg'); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
 }
+
+/* Interaction layer — no timers, data writes, or application JS. */
+.riso-plate { transform-box: fill-box; transform-origin: center; }
+@keyframes riso-green-register {
+  0%, 100% { transform: translate(.7px, .3px); }
+  38% { transform: translate(-.8px, .8px); }
+  68% { transform: translate(1px, -.4px); }
+}
+@keyframes riso-pink-register {
+  0%, 100% { transform: translate(0, 0); }
+  38% { transform: translate(1px, -.6px); }
+  68% { transform: translate(-.6px, .5px); }
+}
+.illust-wrap:focus-visible .riso-plate-green,
+.illust-wrap:active .riso-plate-green { animation: riso-green-register 420ms ease-out; }
+.illust-wrap:focus-visible .riso-plate-pink,
+.illust-wrap:active .riso-plate-pink { animation: riso-pink-register 420ms ease-out; }
+@media (hover: hover) and (pointer: fine) {
+  .illust-wrap:hover .riso-plate-green { animation: riso-green-register 420ms ease-out; }
+  .illust-wrap:hover .riso-plate-pink { animation: riso-pink-register 420ms ease-out; }
+}
+/* A short physical press; original stamp rotation is retained on release. */
+.circle-stamp {
+  transition: scale 180ms ease-out, rotate 180ms ease-out, opacity 180ms ease-out;
+}
+.circle-stamp:active {
+  scale: .91;
+  rotate: -3deg;
+  opacity: .82;
+}
+/* Native checkbox semantics and keyboard operation are preserved. */
+input:is(.cl-checkbox, .item-check) {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  display: inline-grid;
+  place-content: center;
+  border: 1px solid #85887e;
+  border-radius: 2px;
+  background: transparent;
+  vertical-align: middle;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+input:is(.cl-checkbox, .item-check)::after {
+  content: '';
+  width: 10px;
+  height: 6px;
+  border-left: 1.6px solid #fff;
+  border-bottom: 1.6px solid #fff;
+  transform: translateY(-1px) rotate(-45deg);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 180ms ease-out;
+}
+input:is(.cl-checkbox, .item-check):checked {
+  border-color: var(--riso-green);
+  background-color: var(--riso-green);
+}
+input:is(.cl-checkbox, .item-check):checked::after {
+  clip-path: inset(0 -2px -2px -2px);
+  animation: riso-check-draw 180ms ease-out;
+}
+@keyframes riso-check-draw {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 -2px -2px -2px); }
+}
+.cl-text, .item-name, .item-title, .tl-title { transition: color 200ms ease, opacity 200ms ease; }
+.cl-item.done .cl-text, .item-row.checked .item-name,
+.item-card.completed .item-title, .tl-item.completed .tl-title {
+  animation: riso-complete 200ms ease-out;
+}
+@keyframes riso-complete { from { opacity: 1; } to { opacity: .72; } }
+.cl-item.done .cl-text, .item-row.checked .item-name,
+.item-card.completed .item-title, .tl-item.completed .tl-title { opacity: .72; }
+@media (forced-colors: active) {
+  input:is(.cl-checkbox, .item-check) { appearance: auto; }
+  input:is(.cl-checkbox, .item-check)::after { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .circle-stamp:active { scale: 1; rotate: 0deg; }
+}
