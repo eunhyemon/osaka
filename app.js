@@ -90,7 +90,7 @@ const ADMIN_PW = "0000";
     }
   }
 
-  /* Shared Checklist Sync (Safe fetch-merge-push) */
+  /* Shared Checklist Sync */
   async function loadChecklistFromSheet() {
     const statusEl = document.getElementById("cl-sync-status");
     try {
@@ -118,11 +118,11 @@ const ADMIN_PW = "0000";
         }
         renderChecklist();
         statusEl.textContent = "● 시트 연결됨";
-        statusEl.style.color = "var(--matcha)";
+        statusEl.style.color = "var(--riso-green)";
       }
     } catch (err) {
       statusEl.textContent = "● 시트 연결됨";
-      statusEl.style.color = "var(--matcha)";
+      statusEl.style.color = "var(--riso-green)";
     }
   }
 
@@ -163,10 +163,10 @@ const ADMIN_PW = "0000";
         body: JSON.stringify(plannerCache)
       });
       statusEl.textContent = "● 저장 완료";
-      statusEl.style.color = "var(--matcha)";
+      statusEl.style.color = "var(--riso-green)";
     } catch (err) {
       statusEl.textContent = "● 시트 연결됨";
-      statusEl.style.color = "var(--matcha)";
+      statusEl.style.color = "var(--riso-green)";
     }
   }
 
@@ -231,7 +231,6 @@ const ADMIN_PW = "0000";
   function initDragAndDrop() {
     const listEl = document.getElementById("cl-list");
     const handles = listEl.querySelectorAll(".cl-drag-handle");
-
     handles.forEach(handle => {
       handle.addEventListener("pointerdown", onDragStart);
     });
@@ -249,7 +248,7 @@ const ADMIN_PW = "0000";
     if (startIndex === -1) return;
 
     const rects = items.map(el => el.getBoundingClientRect());
-    const itemHeight = rects[startIndex].height + 4; // height + gap
+    const itemHeight = rects[startIndex].height;
 
     handle.setPointerCapture(e.pointerId);
     itemEl.classList.add("is-dragging");
@@ -288,10 +287,8 @@ const ADMIN_PW = "0000";
     const { itemEl, items, rects, itemHeight, startY, currentY, startIndex } = dragState;
     const deltaY = currentY - startY;
 
-    // Move dragged element smoothly using GPU translate3d
     itemEl.style.transform = `translate3d(0, ${deltaY}px, 0)`;
 
-    // Determine new target index based on vertical midpoint
     const draggedCenterY = rects[startIndex].top + rects[startIndex].height / 2 + deltaY;
     let newIndex = startIndex;
 
@@ -306,7 +303,6 @@ const ADMIN_PW = "0000";
 
     dragState.targetIndex = newIndex;
 
-    // Shift sibling items smoothly without layout thrashing
     items.forEach((el, idx) => {
       if (idx === startIndex) return;
       el.style.transition = "transform 0.16s cubic-bezier(0.2, 0, 0, 1)";
@@ -349,8 +345,13 @@ const ADMIN_PW = "0000";
   function renderChecklist() {
     const listEl = document.getElementById("cl-list");
     const countEl = document.getElementById("cl-count");
+    const stampEl = document.getElementById("cl-done-stamp");
     const doneCount = checklist.filter(c => c.done).length;
-    countEl.textContent = "checked: " + doneCount + " / " + checklist.length;
+    countEl.textContent = doneCount + " / " + checklist.length;
+
+    if (stampEl) {
+      stampEl.classList.toggle("visible", checklist.length > 0 && doneCount === checklist.length);
+    }
 
     if (checklist.length === 0) {
       listEl.innerHTML = '<li style="font-size:12.5px; color:var(--muted); padding:6px 2px;">등록된 공통 체크 항목이 없습니다.</li>';
@@ -519,6 +520,12 @@ const ADMIN_PW = "0000";
     event.target.value = "";
   }
 
+  function getTagClass(tag) {
+    if (tag === "SHOPPING") return "tag tag-shopping";
+    if (tag !== "PLANNER") return "tag tag-etc";
+    return "tag";
+  }
+
   function render() {
     const tags = ["ALL", ...new Set(links.map(l => l.tag))];
     if (!tags.includes(currentFilter)) currentFilter = "ALL";
@@ -535,7 +542,7 @@ const ADMIN_PW = "0000";
       '<div class="card">' +
         '<a class="card-link-area" href="' + item.url + '">' +
           '<div class="card-top">' +
-            '<span class="tag">' + item.tag + '</span>' +
+            '<span class="' + getTagClass(item.tag) + '">' + item.tag + '</span>' +
             '<span class="arrow">↗</span>' +
           '</div>' +
           '<div class="card-title">' + item.title + '</div>' +

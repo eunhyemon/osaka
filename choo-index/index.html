@@ -9,18 +9,24 @@
 <body>
 
 <div class="planner-sheet">
-  <div class="crop-mark crop-tl"></div>
-  <div class="crop-mark crop-tr"></div>
-  <div class="crop-mark crop-bl"></div>
-  <div class="crop-mark crop-br"></div>
-
-  <div class="header">
-    <div class="jp-badge">大阪旅手帳 · RISO STAMP</div>
-    <div class="store-name">OSAKA TABI NOTE</div>
-    <div class="store-sub">COUPLE BOOKING &amp; ITINERARY</div>
+  <div class="top-nav">
+    <span class="home-link" style="cursor:default;">OSAKA 2026</span>
+    <div class="riso-swatches" aria-hidden="true">
+      <span style="background:var(--riso-pink)"></span>
+      <span style="background:var(--riso-green)"></span>
+      <span style="background:var(--riso-yellow); border:1px solid #ccc;"></span>
+    </div>
   </div>
 
-  <!-- Google Sheets Sync Status Bar -->
+  <header class="header">
+    <div class="header-main">
+      <div class="jp-badge jp-text">大阪旅手帳</div>
+      <h1 class="store-name">OSAKA TABI NOTE</h1>
+      <div class="store-sub">COUPLE BOOKING &amp; ITINERARY</div>
+    </div>
+    <div class="header-stamp jp-text" aria-hidden="true">旅の<br>記録</div>
+  </header>
+
   <div class="sync-bar">
     <div class="sync-indicator">
       <span class="sync-dot" id="sync-dot"></span>
@@ -33,9 +39,9 @@
   </div>
 
   <div class="util-bar">
-    <button type="button" class="util-btn" onclick="exportBackup()">💾 백업 저장</button>
-    <button type="button" class="util-btn" onclick="document.getElementById('import-file').click()">📂 불러오기</button>
-    <button type="button" class="util-btn" onclick="resetAllData()">🗑️ 초기화</button>
+    <button type="button" class="util-btn" onclick="exportBackup()">백업 저장</button>
+    <button type="button" class="util-btn" onclick="document.getElementById('import-file').click()">불러오기</button>
+    <button type="button" class="util-btn" onclick="resetAllData()">초기화</button>
     <input type="file" id="import-file" accept=".json" style="display:none" onchange="importBackup(event)">
   </div>
 
@@ -51,14 +57,13 @@
   </nav>
 
   <div class="action-bar">
-    <button type="button" class="action-btn primary" onclick="addGroup()">+ 새 그룹(날짜/분류)</button>
+    <button type="button" class="action-btn primary" onclick="addGroup()">+ 새 그룹</button>
     <button type="button" class="action-btn" onclick="openModal()">+ 항목 추가</button>
   </div>
 
   <div id="list-container"></div>
 </div>
 
-<!-- Item Add/Edit Modal -->
 <div class="modal-backdrop" id="planner-modal">
   <div class="modal">
     <h3 id="modal-title">항목 추가</h3>
@@ -71,7 +76,6 @@
       <input type="text" id="edit-title" placeholder="이름 입력">
     </div>
 
-    <!-- Booking Only Fields -->
     <div class="form-group" id="date-group">
       <label>예약/이용 날짜</label>
       <input type="date" id="edit-date">
@@ -85,7 +89,6 @@
       </select>
     </div>
 
-    <!-- Itinerary Only Field -->
     <div class="form-group" id="time-group" style="display:none;">
       <label>방문 시간 (예: 11:30 또는 14:00)</label>
       <input type="time" id="edit-time">
@@ -103,22 +106,6 @@
   </div>
 </div>
 
-<!-- Custom Dialog Modal (Replaces alert / confirm / prompt) -->
-<div class="modal-backdrop" id="dialog-modal" style="z-index: 2000;">
-  <div class="modal" style="max-width: 340px;">
-    <h3 id="dialog-title">안내</h3>
-    <p id="dialog-message" style="font-size: 13px; line-height: 1.5; margin: 0 0 12px; white-space: pre-line;"></p>
-    <div class="form-group" id="dialog-input-wrap" style="display:none; margin-bottom: 10px;">
-      <input type="text" id="dialog-input" placeholder="내용을 입력하세요">
-    </div>
-    <div class="modal-btns" style="margin-top: 10px;">
-      <button type="button" class="btn-cancel" id="dialog-cancel-btn">취소</button>
-      <button type="button" class="btn-primary" id="dialog-ok-btn">확인</button>
-    </div>
-  </div>
-</div>
-
-<!-- Google Sheets Sync Settings Modal -->
 <div class="modal-backdrop" id="sync-modal">
   <div class="modal">
     <h3>
@@ -137,8 +124,8 @@
       <button type="button" class="btn-primary" onclick="saveSheetUrl()">연결 저장</button>
     </div>
 
-    <details style="border-top: 1px dashed var(--line); padding-top: 10px; font-size: 12px;">
-      <summary style="cursor:pointer; font-weight:700; color:var(--riso-indigo);">📋 Apps Script 코드 및 설정 안내 보기</summary>
+    <details style="border-top: 1px solid var(--line); padding-top: 10px; font-size: 12px;">
+      <summary style="cursor:pointer; font-weight:700; color:var(--riso-green);">📋 Apps Script 코드 및 설정 안내 보기</summary>
       <div class="guide-step">
         <strong>1.</strong> Google 스프레드시트 → <strong>[확장 프로그램] → [Apps Script]</strong><br>
         <strong>2.</strong> 아래 코드 붙여넣기 후 <strong>[배포] → [새 배포] → 웹 앱</strong> (액세스 권한: <strong>모든 사용자</strong>)<br>
@@ -158,7 +145,7 @@ function doPost(e) {
   sheet.getRange("A2").setValue("마지막 동기화: " + new Date().toLocaleString());
   return ContentService.createTextOutput(JSON.stringify({status: "ok"})).setMimeType(ContentService.MimeType.JSON);
 }</div>
-      <button type="button" class="small-action-btn" onclick="copyAppsScript()" style="width:100%; padding:6px;">📋 Apps Script 코드 복사하기</button>
+      <button type="button" class="small-action-btn" onclick="copyAppsScript()" style="width:100%; padding:7px; margin-top:4px;">📋 Apps Script 코드 복사하기</button>
     </details>
   </div>
 </div>

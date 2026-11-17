@@ -10,15 +10,23 @@
 
 <div class="receipt">
   <div class="top-nav">
-    <a href="../" class="home-link">← ARCHIVE 목록으로</a>
+    <a href="../" class="home-link">← ARCHIVE</a>
+    <div class="riso-swatches" aria-hidden="true">
+      <span style="background:var(--riso-pink)"></span>
+      <span style="background:var(--riso-green)"></span>
+      <span style="background:var(--riso-yellow); border:1px solid #ccc;"></span>
+    </div>
   </div>
 
-  <div class="header">
-    <div class="store-name">MY OSAKA RECEIPT</div>
-    <div class="store-sub">HAILEY'S PACKING & SHOPPING</div>
-  </div>
+  <header class="header">
+    <div class="header-main">
+      <div class="jp-badge jp-text">買物帳 · HAILEY</div>
+      <h1 class="store-name">MY OSAKA RECEIPT</h1>
+      <div class="store-sub">HAILEY'S PACKING & SHOPPING</div>
+    </div>
+    <div class="header-stamp jp-text" aria-hidden="true">領収<br>記録</div>
+  </header>
 
-  <!-- Google Sheets Sync Bar -->
   <div class="sync-bar">
     <div class="sync-indicator">
       <span class="sync-dot" id="sync-dot"></span>
@@ -30,20 +38,18 @@
     </div>
   </div>
 
-  <!-- Backup / Load Controls -->
   <div class="util-bar">
-    <button type="button" class="util-btn" onclick="exportBackup()">💾 백업 저장</button>
-    <button type="button" class="util-btn" onclick="document.getElementById('import-file').click()">📂 불러오기</button>
-    <button type="button" class="util-btn" onclick="resetAllData()">🗑️ 전체 비우기</button>
+    <button type="button" class="util-btn" onclick="exportBackup()">백업 저장</button>
+    <button type="button" class="util-btn" onclick="document.getElementById('import-file').click()">불러오기</button>
+    <button type="button" class="util-btn" onclick="resetAllData()">전체 비우기</button>
     <input type="file" id="import-file" accept=".json" style="display:none" onchange="importBackup(event)">
   </div>
 
-  <!-- Exchange Rate -->
   <div class="rate-box" id="rate-box">
-    <span>🇯🇵 100엔 =</span>
+    <span>100 JPY =</span>
     <div class="rate-input-wrap">
       <input type="number" id="rate-input" class="rate-input" step="0.1" value="905" onchange="updateRate(this.value)">
-      <span>원</span>
+      <span>KRW</span>
     </div>
     <button type="button" class="rate-fetch-btn" id="fetch-rate-btn" onclick="fetchLiveRate()">↻ 실시간 환율</button>
   </div>
@@ -74,8 +80,8 @@
     <div class="total-row grand">
       <span>ESTIMATED TOTAL</span>
       <div style="text-align:right">
-        <div id="grand-total-jpy">¥0</div>
-        <div id="grand-total-krw" style="font-size:13px; color:var(--muted);">≈ 0원</div>
+        <div id="grand-total-jpy" class="grand-jpy-highlight">¥0</div>
+        <div id="grand-total-krw" style="font-size:12.5px; color:var(--muted); margin-top:2px;">≈ 0원</div>
       </div>
     </div>
   </div>
@@ -86,7 +92,6 @@
   </div>
 </div>
 
-<!-- Edit / Add Item Modal -->
 <div class="modal-backdrop" id="item-modal">
   <div class="modal">
     <h3 id="modal-title">품목 수정</h3>
@@ -127,7 +132,6 @@
   </div>
 </div>
 
-<!-- Image Zoom Modal -->
 <div class="img-preview-backdrop" id="img-preview-modal" onclick="closeImgPreview(event)">
   <div class="img-preview-box" onclick="event.stopPropagation()">
     <img id="preview-img-el" src="" alt="상품 이미지">
@@ -139,7 +143,6 @@
   </div>
 </div>
 
-<!-- Google Sheets Sync Settings Modal -->
 <div class="modal-backdrop" id="sync-modal">
   <div class="modal">
     <h3>
@@ -158,8 +161,8 @@
       <button type="button" class="btn-primary" onclick="saveSheetUrl()">연결 저장</button>
     </div>
 
-    <details style="border-top: 1px dashed var(--line); padding-top: 10px; font-size: 12px;">
-      <summary style="cursor:pointer; font-weight:700;">📋 Apps Script 코드 및 설정 안내 보기</summary>
+    <details style="border-top: 1px solid var(--line); padding-top: 10px; font-size: 12px;">
+      <summary style="cursor:pointer; font-weight:700; color:var(--riso-green);">📋 Apps Script 코드 및 설정 안내 보기</summary>
       <div class="guide-step">
         <strong>1.</strong> 새 Google 스프레드시트 생성 → <strong>[확장 프로그램] → [Apps Script]</strong><br>
         <strong>2.</strong> 아래 코드 붙여넣기 후 <strong>[배포] → [새 배포] → 웹 앱</strong> (액세스 권한: <strong>모든 사용자</strong>)<br>
@@ -179,7 +182,7 @@ function doPost(e) {
   sheet.getRange("A2").setValue("마지막 동기화: " + new Date().toLocaleString());
   return ContentService.createTextOutput(JSON.stringify({status: "ok"})).setMimeType(ContentService.MimeType.JSON);
 }</div>
-      <button type="button" class="small-action-btn" onclick="copyAppsScript()" style="width:100%; padding:6px;">📋 Apps Script 코드 복사하기</button>
+      <button type="button" class="small-action-btn" onclick="copyAppsScript()" style="width:100%; padding:7px; margin-top:4px;">📋 Apps Script 코드 복사하기</button>
     </details>
   </div>
 </div>

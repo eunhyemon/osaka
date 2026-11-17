@@ -9,39 +9,141 @@
 <body>
 
 <div class="wrap">
-  <header class="header">
-    <div class="title-area">
+  <header class="top-bar">
+    <div class="brand-area">
       <h1>MY ARCHIVE</h1>
       <p>OSAKA 2026 · PERSONAL WEB INDEX</p>
     </div>
-    <button type="button" class="add-btn admin-only" onclick="openLinkModal()">+ 새 링크</button>
+    <div class="top-actions">
+      <div class="riso-swatches" aria-hidden="true" title="RISOGRAPH 3-COLOR PALETTE">
+        <span style="background:var(--riso-pink)"></span>
+        <span style="background:var(--riso-green)"></span>
+        <span style="background:var(--riso-yellow); border:1px solid #ccc;"></span>
+      </div>
+      <button type="button" class="add-btn admin-only" onclick="openLinkModal()">+ 새 링크</button>
+    </div>
   </header>
 
-  <!-- Shared Couple Checklist -->
-  <section class="checklist-box" aria-label="공통 체크리스트">
+  <section class="hero-section">
+    <div class="hero-copy">
+      <div class="hero-lead">
+        함께 준비하는<br>
+        우리의 오사카 여행.<br>
+        <span class="hero-sub-kr">일정부터 쇼핑 영수증까지 한곳에.</span>
+      </div>
+      <div class="hero-meta">
+        <span>2026. 11. 30 — 12. 02</span>
+        <span class="hero-dot">·</span>
+        <span>OSAKA, JAPAN</span>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="jp-vert jp-text" aria-hidden="true">二〇二六年・わたしたちの旅</div>
+      <div class="jp-stamp jp-text" aria-hidden="true">大阪</div>
+
+      <div class="illust-wrap">
+        <img src="./couple.png" alt="커플 일러스트" class="custom-illust" onerror="this.style.display='none'; document.getElementById('default-couple-svg').style.display='block';">
+        <svg id="default-couple-svg" viewBox="0 0 280 265" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="커플 라인 일러스트">
+          <path d="M42 74 L44 80 L50 82 L44 84 L42 90 L40 84 L34 82 L40 80 Z" stroke="#000000" stroke-width="1.4" stroke-linejoin="round"/>
+          <path d="M242 54 L243.5 58.5 L248 60 L243.5 61.5 L242 66 L240.5 61.5 L236 60 L240.5 58.5 Z" stroke="#000000" stroke-width="1.3" stroke-linejoin="round"/>
+          <path d="M254 74 L254 80 M251 77 L257 77" stroke="#000000" stroke-width="1.3" stroke-linecap="round"/>
+
+          <g stroke="#000000" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M62 84 C58 64 70 43 93 43 C115 43 125 60 122 81 C120 71 113 62 103 58 C95 66 81 71 67 72 C65 76 63 80 62 84 Z" fill="#000000" stroke-width="1.6"/>
+            <path d="M88 45 C92 51 94 56 93 61" stroke="#ffffff" stroke-width="1.3"/>
+            <path d="M66 73 C64 89 67 109 80 116 C92 122 109 116 116 102 C121 92 121 80 119 71" fill="#ffffff" stroke-width="1.8"/>
+            <path d="M65 86 C59 85 58 97 65 100" fill="#ffffff" stroke-width="1.6"/>
+            <circle cx="88" cy="86" r="2" fill="#000000" stroke="none"/>
+            <circle cx="108" cy="86" r="2" fill="#000000" stroke="none"/>
+            <path d="M84 79 C87 77.5 91 77.5 93 79" stroke-width="1.4"/>
+            <path d="M104 79 C107 77.5 111 77.5 113 79" stroke-width="1.4"/>
+            <path d="M99 88 L100 95 L97 96" stroke-width="1.5"/>
+            <path d="M91 104 C95 106.5 101 106 104 103.5" stroke-width="1.6"/>
+            <path d="M82 117 L82 132 M103 115 L103 130" stroke-width="1.8"/>
+            <path d="M76 132 C84 140 99 140 108 131" stroke-width="1.7"/>
+            <path d="M73 134 C53 142 38 166 33 212 C31 232 32 248 34 258" stroke-width="1.9"/>
+            <path d="M111 132 C128 140 142 162 148 198 C151 218 152 242 151 258" stroke-width="1.9"/>
+            <path d="M77 135 L82 258" stroke-width="1.7"/>
+            <path d="M106 134 L112 258" stroke-width="1.7"/>
+            <path d="M64 139 C56 158 53 188 55 218 L63 218 C61 188 64 158 72 136 Z" fill="#ffffff" stroke-width="1.7"/>
+            <path d="M115 135 C123 155 127 184 127 212 L134 211 C134 182 129 154 120 137 Z" fill="#ffffff" stroke-width="1.7"/>
+            <path d="M51 196 L48 258" stroke-width="1.6"/>
+            <path d="M63 206 C68 210 71 215 70 221" stroke-width="1.5"/>
+          </g>
+
+          <g stroke="#000000" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M166 112 C158 134 155 162 160 184" stroke-width="1.7"/>
+            <path d="M222 108 C231 132 234 160 228 184" stroke-width="1.7"/>
+            <path d="M167 110 C166 86 177 72 195 72 C213 72 223 86 222 110 C222 124 211 134 195 134 C179 134 168 124 167 110 Z" fill="#ffffff" stroke-width="1.8"/>
+            <path d="M167 104 C172 91 183 83 195 77 C204 84 214 92 222 103" stroke-width="1.7"/>
+            <path d="M207 82 L216 88" stroke-width="3.2"/>
+            <path d="M222 104 C227 104 228 114 222 116" fill="#ffffff" stroke-width="1.5"/>
+            <circle cx="185" cy="107" r="1.9" fill="#000000" stroke="none"/>
+            <circle cx="204" cy="107" r="1.9" fill="#000000" stroke="none"/>
+            <path d="M181 100 C184 98.5 187 98.5 189 100" stroke-width="1.3"/>
+            <path d="M201 100 C203 98.5 206 98.5 208 100" stroke-width="1.3"/>
+            <path d="M194 108 L193 113 L195.5 114" stroke-width="1.4"/>
+            <path d="M189 120 C193 123 198 123 201 120" stroke-width="1.5"/>
+            <path d="M176 114 L175 117 M180 114 L179 117 M209 114 L208 117 M213 114 L212 117" stroke-width="1.1"/>
+            <path d="M188 134 L188 147 M202 134 L202 147" stroke-width="1.7"/>
+            <path d="M164 152 C175 146 214 146 226 152 C236 168 242 204 244 258 L148 258 C150 206 155 168 164 152 Z" fill="#ffffff" stroke-width="1.8"/>
+            <path d="M181 148 C187 156 203 156 209 148" stroke-width="1.6"/>
+            <path d="M195 154 L195 258" stroke-width="1.5"/>
+            <path d="M174 151 L168 258 M184 152 L180 258 M206 152 L210 258 M216 151 L222 258" stroke-width="1.2"/>
+            <path d="M167 151 C160 172 157 200 158 226 L165 226 C164 200 167 172 174 150 Z" fill="#000000" stroke-width="1.5"/>
+            <path d="M216 150 C224 172 228 202 228 232 L235 231 C235 201 230 171 222 151 Z" fill="#000000" stroke-width="1.5"/>
+          </g>
+
+          <g stroke="#000000" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M26 258 C24 244 20 232 14 222"/>
+            <path d="M21 238 C15 236 12 232 13 228 C17 229 20 233 21 238 Z" fill="#ffffff"/>
+            <path d="M24 246 C29 242 32 238 30 234 C26 236 24 241 24 246 Z" fill="#ffffff"/>
+            <path d="M254 258 C256 242 260 228 267 216"/>
+            <path d="M259 235 C265 233 268 229 267 225 C263 226 260 230 259 235 Z" fill="#ffffff"/>
+            <path d="M256 245 C250 242 247 238 249 234 C253 236 255 240 256 245 Z" fill="#ffffff"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="checklist-section" aria-label="공통 체크리스트">
+    <div class="done-stamp jp-text" id="cl-done-stamp">準備完了</div>
+
     <div class="cl-header">
-      <div class="cl-title">🤝 공통 체크리스트 (같이 준비할 것)</div>
+      <div class="cl-title-wrap">
+        <span class="cl-title">공통 체크리스트</span>
+        <span class="cl-sub-jp jp-text">持ち物・準備</span>
+      </div>
       <div class="cl-status-wrap">
         <span class="cl-sync-badge" id="cl-sync-status">동기화 대기</span>
         <span class="cl-count" id="cl-count">0 / 0</span>
       </div>
     </div>
+
     <ul class="cl-list" id="cl-list"></ul>
+
     <div class="cl-add-row">
-      <input type="text" id="cl-new-input" class="cl-input" placeholder="+ 새 공통 체크 항목 입력..." onkeydown="if(event.key==='Enter') addCheckItem()">
-      <button type="button" class="cl-add-btn" onclick="addCheckItem()">+ 추가</button>
+      <input type="text" id="cl-new-input" class="cl-input" placeholder="+ 함께 준비할 항목 추가..." onkeydown="if(event.key==='Enter') addCheckItem()">
+      <button type="button" class="cl-add-btn" onclick="addCheckItem()">추가</button>
     </div>
   </section>
 
-  <!-- Filter Pills -->
-  <div class="filter-bar" id="filter-bar"></div>
+  <section class="directory-section">
+    <div class="dir-head">
+      <div class="dir-title-group">
+        <span class="dir-title">INDEX</span>
+        <span class="dir-sub-jp jp-text">旅のしおり一覧</span>
+      </div>
+      <div class="filter-bar" id="filter-bar"></div>
+    </div>
 
-  <!-- Directory Cards -->
-  <div class="grid" id="card-grid"></div>
+    <div class="grid" id="card-grid"></div>
+  </section>
 
-  <!-- Footer -->
   <footer class="footer-bar">
-    <span>JP-2026 DIRECTORY</span>
+    <span>JP-2026 DIRECTORY · 3-COLOR RISO</span>
     <div class="footer-right">
       <div class="util-btns admin-only-flex">
         <button type="button" class="util-btn" onclick="exportData()">백업</button>
@@ -54,7 +156,6 @@
   </footer>
 </div>
 
-<!-- Admin Password Modal -->
 <div class="modal-backdrop" id="pw-modal">
   <div class="modal">
     <h3>관리자 모드 잠금 해제</h3>
@@ -71,7 +172,6 @@
   </div>
 </div>
 
-<!-- Edit Checklist Item Modal -->
 <div class="modal-backdrop" id="cl-edit-modal">
   <div class="modal">
     <h3>체크리스트 항목 수정</h3>
@@ -86,7 +186,6 @@
   </div>
 </div>
 
-<!-- Add / Edit Link Modal -->
 <div class="modal-backdrop" id="link-modal">
   <div class="modal">
     <h3 id="modal-heading">새 링크 추가</h3>
@@ -114,7 +213,6 @@
   </div>
 </div>
 
-<!-- Confirm Reset Modal -->
 <div class="modal-backdrop" id="reset-modal">
   <div class="modal">
     <h3>기본 목록으로 초기화</h3>
