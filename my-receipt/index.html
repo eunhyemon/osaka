@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MY OSAKA RECEIPT</title>
-<link rel="stylesheet" href="./style.css?v=lookbook1">
+<link rel="stylesheet" href="./style.css?v=receiptrestore1">
 <link rel="stylesheet" href="../riso.css">
 </head>
 <body>
@@ -64,10 +64,6 @@
       <span>PACKING</span>
       <span class="tab-count" id="count-packing">0</span>
     </button>
-    <button type="button" class="tab-btn" id="tab-lookbook" onclick="switchTab('lookbook')">
-      <span>LOOKBOOK</span>
-      <span class="tab-count" id="count-lookbook">0</span>
-    </button>
   </nav>
 
   <div class="global-check-bar">
@@ -76,11 +72,6 @@
   </div>
 
   <div id="list-container"></div>
-
-  <section id="lookbook-panel" hidden aria-label="날짜별 코디">
-    <p class="lookbook-note">이 기기에만 저장되는 나의 여행 코디</p>
-    <div id="lookbook-grid"></div>
-  </section>
 
   <div class="total-section" id="total-section">
     <div class="total-row">
@@ -197,7 +188,6 @@ function doPost(e) {
   </div>
 </div>
 
-<script src="./lookbook.js?v=1"></script>
-<script src="./app.js?v=lookbook1"></script>
+<script src="./app.js?v=receiptrestore1"></script>
 </body>
 </html>
