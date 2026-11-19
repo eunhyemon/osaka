@@ -166,7 +166,15 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
     }
   }
 
+  let lookbookActive = false;
   function switchTab(tab) {
+    if (tab === "lookbook") {
+      lookbookActive = true;
+      render();
+      return;
+    }
+    if (tab !== "shopping" && tab !== "packing") return;
+    lookbookActive = false;
     appData.activeTab = tab;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
     render();
@@ -458,6 +466,24 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
   }
 
   function render() {
+    document.getElementById("tab-lookbook").classList.toggle("active", lookbookActive);
+    document.getElementById("lookbook-panel").hidden = !lookbookActive;
+    document.querySelector(".global-check-bar").style.display = lookbookActive ? "none" : "";
+    document.getElementById("list-container").style.display = lookbookActive ? "none" : "";
+    document.querySelector(".sync-bar").style.display = lookbookActive ? "none" : "";
+    document.querySelector(".util-bar").style.display = lookbookActive ? "none" : "";
+    const shopCountNow = appData.shopping.reduce((acc, c) => acc + c.items.length, 0);
+    const packCountNow = appData.packing.reduce((acc, c) => acc + c.items.length, 0);
+    document.getElementById("count-shopping").textContent = shopCountNow;
+    document.getElementById("count-packing").textContent = packCountNow;
+    if (lookbookActive) {
+      document.getElementById("tab-shopping").classList.remove("active");
+      document.getElementById("tab-packing").classList.remove("active");
+      document.getElementById("rate-box").style.display = "none";
+      document.getElementById("total-section").style.display = "none";
+      window.renderLookbook();
+      return;
+    }
     document.getElementById("rate-input").value = appData.rate;
     const isShopping = appData.activeTab === "shopping";
 
