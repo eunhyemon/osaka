@@ -368,6 +368,65 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
     event.target.value = "";
   }
 
+
+  // Timeline presentation only; never changes the shared itinerary.
+  const collapsedDays = new Set();
+  function escapeTimeline(value) {
+    return String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+  function timelineCategory(title) {
+    const t = String(title || "");
+    const tag = t.match(/^\s*\[([^\]]+)\]\s*/);
+    const label = tag ? tag[1] : "";
+    let kind = "other", name = label;
+    if (/이동|출발|도착|공항|라피트|체크아웃|복귀/.test(label || t)) {kind="move";name=name||"이동";}
+    else if (/예약/.test(label || t)) {kind="reserve";name=name||"예약";}
+    else if (/굿즈|쇼핑|아존|인형/.test(label || t)) {kind="shop";name=name||"쇼핑";}
+    else if (/스시|라멘|몬자|야키니쿠|저녁|점심|식사|타코야끼/.test(label || t)) {kind="food";name=name||"식사";}
+    return {kind,name,title:tag?t.slice(tag[0].length):t};
+  }
+  function renderTimelineDay(group, index) {
+    const section=document.createElement("section");
+    section.className="itinerary-day";
+    const sorted=[...group.items].sort((a,b)=>(a.time||"99:99").localeCompare(b.time||"99:99"));
+    const heading=document.createElement("div");
+    heading.className="day-heading";
+    const toggle=document.createElement("button");
+    toggle.type="button";toggle.className="day-toggle";
+    const dayLabel=String(group.title||"").replace(/^📅\s*/u,"");
+    toggle.innerHTML='<span class="day-number">DAY '+String(index+1).padStart(2,"0")+'.</span><span class="day-name">'+escapeTimeline(dayLabel)+'</span><span class="day-total">'+sorted.filter(x=>x.completed).length+'/'+sorted.length+'</span><span class="day-chevron" aria-hidden="true">⌄</span>';
+    const controls=document.createElement("div");controls.className="day-controls";
+    for(const [label,description,action] of [["✎","그룹명 수정",()=>editGroup(group.id)],["＋","항목 추가",()=>openModal(group.id)],["×","그룹 삭제",()=>deleteGroup(group.id)]]) {
+      const b=document.createElement("button");b.type="button";b.textContent=label;b.title=description;b.setAttribute("aria-label",description);b.addEventListener("click",action);controls.appendChild(b);
+    }
+    heading.append(toggle,controls);section.appendChild(heading);
+    const list=document.createElement("div");list.className="route-timeline";
+    const apply=()=>{const closed=collapsedDays.has(group.id);list.hidden=closed;toggle.setAttribute("aria-expanded",String(!closed));section.classList.toggle("is-collapsed",closed);};
+    toggle.addEventListener("click",()=>{if(collapsedDays.has(group.id))collapsedDays.delete(group.id);else collapsedDays.add(group.id);apply();});
+    for(const item of sorted) {
+      const cat=timelineCategory(item.title);
+      const row=document.createElement("div");row.className="route-row route-"+cat.kind+(item.completed?" completed":"");
+      const time=document.createElement("span");time.className="route-time";time.textContent=item.time||"—";
+      const dot=document.createElement("span");dot.className="route-dot";dot.setAttribute("aria-hidden","true");
+      const body=document.createElement("div");body.className="route-body";
+      const top=document.createElement("div");top.className="route-title-line";
+      if(cat.name){const label=document.createElement("span");label.className="route-category";label.textContent=cat.name;top.appendChild(label);}
+      const title=document.createElement("span");title.className="route-title";title.textContent=cat.title;top.appendChild(title);body.appendChild(top);
+      if(item.memo){
+        const memo=document.createElement("div");memo.className="route-memo";
+        const parts=String(item.memo).split(/(https?:\/\/[^\s]+)/g);
+        for(const part of parts){if(/^https?:\/\//.test(part)){const a=document.createElement("a");a.href=part;a.target="_blank";a.rel="noopener noreferrer";a.textContent=/maps\.app\.goo\.gl|google\.[^/]+\/maps|maps\.google/.test(part)?"지도 ↗":"링크 ↗";memo.appendChild(a);}else memo.appendChild(document.createTextNode(part));}
+        body.appendChild(memo);
+      }
+      const actions=document.createElement("div");actions.className="route-actions";
+      const check=document.createElement("input");check.type="checkbox";check.className="item-check";check.checked=!!item.completed;check.setAttribute("aria-label",cat.title+" 완료");check.addEventListener("change",()=>toggleItemCheck(group.id,item.id));
+      const edit=document.createElement("button");edit.type="button";edit.className="tl-edit-btn";edit.textContent="✎";edit.title="일정 수정";edit.setAttribute("aria-label",cat.title+" 수정");edit.addEventListener("click",()=>openModal(group.id,item.id));actions.append(check,edit);
+      row.append(time,dot,body,actions);list.appendChild(row);
+    }
+    if(!sorted.length){const empty=document.createElement("p");empty.className="route-empty";empty.textContent="등록된 일정이 없습니다.";list.appendChild(empty);}
+    section.appendChild(list);apply();return section;
+  }
+
   function render() {
     const isBooking = appData.activeTab === "booking";
     document.getElementById("tab-booking").classList.toggle("active", isBooking);
@@ -386,6 +445,8 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
       container.innerHTML = '<div class="empty-state">등록된 그룹이 없습니다.<br>상단의 <strong>[+ 새 그룹]</strong>을 눌러 시작해 보세요.</div>';
       return;
     }
+
+    if (!isBooking) { groups.forEach((group,index) => container.appendChild(renderTimelineDay(group,index))); return; }
 
     groups.forEach(group => {
       const gDiv = document.createElement("div");
