@@ -499,6 +499,7 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
 
       const catDiv = document.createElement("div");
       catDiv.className = "category";
+      catDiv.dataset.catId = cat.id;
 
       let itemsHtml = "";
       cat.items.forEach(item => {
@@ -516,6 +517,7 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
           const thumbHtml = item.img ? `<img src="${item.img}" alt="">` : `+📷`;
           itemsHtml += `
             <div class="item-row ${item.checked ? "checked" : ""}">
+              <button type="button" class="item-drag-handle" aria-label="항목 드래그해서 이동" title="길게 잡아 이동">⠿</button>
               <input type="checkbox" class="item-check" ${item.checked ? "checked" : ""} onchange="toggleItem('${cat.id}', '${item.id}')">
               <div class="item-thumb ${item.img ? "has-img" : ""}" onclick="handleThumbClick('${cat.id}', '${item.id}')">${thumbHtml}</div>
               <div class="item-info">
@@ -538,6 +540,7 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
         } else {
           itemsHtml += `
             <div class="item-row packing-row ${item.checked ? "checked" : ""}">
+              <button type="button" class="item-drag-handle" aria-label="항목 드래그해서 이동" title="길게 잡아 이동">⠿</button>
               <input type="checkbox" class="item-check" ${item.checked ? "checked" : ""} onchange="toggleItem('${cat.id}', '${item.id}')">
               <div class="item-info" onclick="toggleItem('${cat.id}', '${item.id}')" style="cursor:pointer;">
                 <div class="item-name">${item.name}${qtyBadgeHtml}</div>
@@ -578,6 +581,10 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
         ${itemsHtml || `<div style="font-size:12px; color:#888; padding:8px 4px;">항목이 없습니다. '+ 추가'를 눌러 등록하세요.</div>`}
         ${footerHtml}
       `;
+      // Attach identifiers in DOM properties so image/price/checkbox state remains untouched.
+      catDiv.querySelectorAll(".item-row").forEach((row, i) => {
+        row.dataset.itemId = cat.items[i].id;
+      });
       container.appendChild(catDiv);
     });
 
@@ -587,6 +594,130 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
       document.getElementById("grand-total-krw").textContent = `≈ ${toKrw(grandJpy).toLocaleString()}원`;
     }
   }
+
+
+  /* Pointer-based sortable list. Dedicated handles protect checkboxes and edit actions.
+     Works with mouse or touch, including moving items to empty or other categories.
+     A move only changes the current tab's arrays; saveData keeps cloud sync as before. */
+  (() => {
+    const container = document.getElementById("list-container");
+    let dragging = null;
+    let ignoreClickUntil = 0;
+    const getCats = () => appData[appData.activeTab];
+
+    function findDestination(x, y) {
+      const element = document.elementFromPoint(x, y);
+      if (!element) return null;
+      const catEl = element.closest(".category");
+      if (!catEl || !container.contains(catEl)) return null;
+      const row = element.closest(".item-row");
+      if (row && catEl.contains(row)) {
+        const rect = row.getBoundingClientRect();
+        return {catId: catEl.dataset.catId, itemId: row.dataset.itemId, after: y > rect.top + rect.height / 2, catEl, row};
+      }
+      // Dropping on a category header or an empty category appends to that category.
+      return {catId: catEl.dataset.catId, itemId: null, after: true, catEl, row: null};
+    }
+
+    function resetHighlight() {
+      container.querySelectorAll(".drop-before,.drop-after,.drop-category").forEach(el => el.classList.remove("drop-before","drop-after","drop-category"));
+    }
+    function showDestination(dest) {
+      resetHighlight();
+      if (dest) {
+        if (dest.row) dest.row.classList.add(dest.after ? "drop-after" : "drop-before");
+        else dest.catEl.classList.add("drop-category");
+      }
+    }
+    function moveItem(fromCatId, itemId, dest) {
+      if (!dest) return;
+      const cats = getCats();
+      const source = cats.find(c => String(c.id) === fromCatId);
+      const target = cats.find(c => String(c.id) === dest.catId);
+      if (!source || !target) return;
+      const from = source.items.findIndex(i => String(i.id) === itemId);
+      if (from < 0) return;
+      let to = dest.itemId === null ? target.items.length : target.items.findIndex(i => String(i.id) === dest.itemId) + (dest.after ? 1 : 0);
+      if (to < 0) to = target.items.length;
+      if (source === target && to > from) to--;
+      if (source === target && to === from) return;
+      const [item] = source.items.splice(from, 1);
+      target.items.splice(to, 0, item);
+      saveData(true);
+      render();
+    }
+    function cleanup() {
+      if (!dragging) return;
+      if (dragging.ghost) dragging.ghost.remove();
+      dragging.row.classList.remove("item-moving");
+      dragging.handle.classList.remove("dragging");
+      resetHighlight();
+      document.body.classList.remove("is-sorting");
+      dragging = null;
+    }
+    container.addEventListener("click", event => {
+      if (Date.now() < ignoreClickUntil && event.target.closest(".item-drag-handle")) {
+        event.preventDefault(); event.stopPropagation();
+      }
+    }, true);
+    container.addEventListener("pointerdown", event => {
+      const handle = event.target.closest(".item-drag-handle");
+      if (!handle || !container.contains(handle) || dragging || (event.pointerType === "mouse" && event.button !== 0)) return;
+      const row = handle.closest(".item-row");
+      const category = handle.closest(".category");
+      if (!row || !category) return;
+      const rect = row.getBoundingClientRect();
+      dragging = {
+        pointerId: event.pointerId, handle, row,
+        catId: category.dataset.catId, itemId: row.dataset.itemId,
+        originX: event.clientX, originY: event.clientY,
+        width: rect.width, offsetX: event.clientX - rect.left, offsetY: event.clientY - rect.top,
+        ghost: null, destination: null
+      };
+      handle.setPointerCapture(event.pointerId);
+    });
+    container.addEventListener("pointermove", event => {
+      const d = dragging;
+      if (!d || d.pointerId !== event.pointerId) return;
+      if (!d.ghost) {
+        if (Math.hypot(event.clientX - d.originX, event.clientY - d.originY) < 6) return;
+        const ghost = d.row.cloneNode(true);
+        ghost.classList.add("drag-ghost");
+        ghost.style.width = d.width + "px";
+        document.body.appendChild(ghost);
+        d.ghost = ghost;
+        d.row.classList.add("item-moving");
+        d.handle.classList.add("dragging");
+        document.body.classList.add("is-sorting");
+      }
+      event.preventDefault();
+      d.ghost.style.left = (event.clientX - d.offsetX) + "px";
+      d.ghost.style.top = (event.clientY - d.offsetY) + "px";
+      const dest = findDestination(event.clientX, event.clientY);
+      d.destination = dest;
+      showDestination(dest);
+      const margin = 48;
+      if (event.clientY < margin) window.scrollBy(0, -13);
+      else if (event.clientY > window.innerHeight - margin) window.scrollBy(0, 13);
+    }, {passive:false});
+    const finish = (event, cancelled) => {
+      const d = dragging;
+      if (!d || d.pointerId !== event.pointerId) return;
+      const wasMoved = Boolean(d.ghost);
+      const fromCatId = d.catId;
+      const itemId = d.itemId;
+      const dest = cancelled ? null : findDestination(event.clientX, event.clientY) || d.destination;
+      cleanup();
+      try {d.handle.releasePointerCapture(event.pointerId)} catch (_) {}
+      if (wasMoved) {
+        ignoreClickUntil = Date.now() + 350;
+        if (dest) moveItem(fromCatId, itemId, dest);
+      }
+    };
+    container.addEventListener("pointerup", e => finish(e, false));
+    container.addEventListener("pointercancel", e => finish(e, true));
+    window.addEventListener("blur", () => cleanup());
+  })();
 
   render();
   if (getSheetUrl()) {
