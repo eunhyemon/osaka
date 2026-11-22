@@ -247,7 +247,7 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
     }
 
     if (!isBooking) {
-      targetGroup.items.sort((a, b) => (a.time || "99:99").localeCompare(b.time || "99:99"));
+      if (!targetGroup.manualOrder) targetGroup.items.sort((a, b) => (a.time || "99:99").localeCompare(b.time || "99:99"));
     }
 
     saveData(true);
@@ -388,7 +388,8 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
   function renderTimelineDay(group, index) {
     const section=document.createElement("section");
     section.className="itinerary-day";
-    const sorted=[...group.items].sort((a,b)=>(a.time||"99:99").localeCompare(b.time||"99:99"));
+    section.dataset.groupId=String(group.id);
+    const sorted=group.manualOrder ? [...group.items] : [...group.items].sort((a,b)=>(a.time||"99:99").localeCompare(b.time||"99:99"));
     const heading=document.createElement("div");
     heading.className="day-heading";
     const toggle=document.createElement("button");
@@ -406,12 +407,16 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
     for(const item of sorted) {
       const cat=timelineCategory(item.title);
       const row=document.createElement("div");row.className="route-row route-"+cat.kind+(item.completed?" completed":"");
+      row.dataset.itemId=String(item.id);
       const time=document.createElement("span");time.className="route-time";time.textContent=item.time||"—";
       const dot=document.createElement("span");dot.className="route-dot";dot.setAttribute("aria-hidden","true");
       const body=document.createElement("div");body.className="route-body";
       const top=document.createElement("div");top.className="route-title-line";
       if(cat.name){const label=document.createElement("span");label.className="route-category";label.textContent=cat.name;top.appendChild(label);}
-      const title=document.createElement("span");title.className="route-title";title.textContent=cat.title;top.appendChild(title);body.appendChild(top);
+      const title=document.createElement("span");title.className="route-title";title.textContent=cat.title;top.appendChild(title);
+      const handle=document.createElement("button");handle.type="button";handle.className="planner-drag-handle";handle.textContent="⠿";
+      handle.title="잡아서 일정 이동";handle.setAttribute("aria-label",cat.title+" 순서 또는 날짜 이동");
+      body.prepend(handle);body.appendChild(top);
       if(item.memo){
         const memo=document.createElement("div");memo.className="route-memo";
         const parts=String(item.memo).split(/(https?:\/\/[^\s]+)/g);
@@ -451,6 +456,7 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
     groups.forEach(group => {
       const gDiv = document.createElement("div");
       gDiv.className = "group-section";
+      gDiv.dataset.groupId = String(group.id);
 
       let itemsHtml = "";
       if (isBooking) {
@@ -458,6 +464,7 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
           const stamp = getStampInfo(item.status);
           itemsHtml +=
             '<div class="item-card ' + (item.completed ? 'completed' : '') + '">' +
+              '<button type="button" class="planner-drag-handle" title="잡아서 예약 이동" aria-label="예약 항목 순서 또는 그룹 이동">⠿</button>' +
               '<div class="item-main">' +
                 '<div class="item-top-row">' +
                   '<input type="checkbox" class="item-check" ' + (item.completed ? 'checked' : '') + ' onchange="toggleItemCheck(\'' + group.id + '\', \'' + item.id + '\')">' +
@@ -512,9 +519,118 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
           '</div>' +
         '</div>' +
         (itemsHtml || '<div style="font-size:12px; color:#888; padding:8px 4px;">등록된 항목이 없습니다.</div>');
+      gDiv.querySelectorAll(".item-card").forEach((row,i)=>{row.dataset.itemId=String(group.items[i].id)});
       container.appendChild(gDiv);
     });
   }
+
+
+  /* Sort booking cards and itinerary rows on mouse/touch with a dedicated handle.
+     The destination can be any group/day in the active tab, including empty days.
+     Existing reservations, time labels, completion state and cloud data are preserved. */
+  (() => {
+    const container=document.getElementById("list-container");
+    let drag=null;
+    const groups=()=>appData[appData.activeTab];
+    const ordered=group=> appData.activeTab==="itinerary" && !group.manualOrder
+      ? [...group.items].sort((a,b)=>(a.time||"99:99").localeCompare(b.time||"99:99"))
+      : [...group.items];
+    const rowSelector=".item-card,.route-row";
+    const groupSelector=".group-section,.itinerary-day";
+    function targetAt(x,y){
+      const el=document.elementFromPoint(x,y);
+      const grp=el&&el.closest(groupSelector);
+      if(!grp || !container.contains(grp))return null;
+      const row=el.closest(rowSelector);
+      if(row && grp.contains(row)){
+        const r=row.getBoundingClientRect();
+        return {groupId:grp.dataset.groupId,itemId:row.dataset.itemId,after:y>r.top+r.height/2,row,grp};
+      }
+      return {groupId:grp.dataset.groupId,itemId:null,after:true,row:null,grp};
+    }
+    function indicators(target){
+      container.querySelectorAll(".planner-drop-before,.planner-drop-after,.planner-drop-group")
+        .forEach(el=>el.classList.remove("planner-drop-before","planner-drop-after","planner-drop-group"));
+      if(!target)return;
+      if(target.row)target.row.classList.add(target.after?"planner-drop-after":"planner-drop-before");
+      else target.grp.classList.add("planner-drop-group");
+    }
+    function move(fromGroupId,itemId,dest){
+      if(!dest)return;
+      const items=groups();
+      const source=items.find(g=>String(g.id)===fromGroupId);
+      const target=items.find(g=>String(g.id)===dest.groupId);
+      if(!source||!target)return;
+      const srcList=ordered(source),dstList=source===target?srcList:ordered(target);
+      const from=srcList.findIndex(i=>String(i.id)===itemId);
+      if(from<0)return;
+      let to=dest.itemId==null?dstList.length:dstList.findIndex(i=>String(i.id)===dest.itemId)+(dest.after?1:0);
+      if(to<0)to=dstList.length;
+      if(source===target&&to>from)to--;
+      if(source===target&&from===to)return;
+      const [item]=srcList.splice(from,1);
+      dstList.splice(to,0,item);
+      source.items=srcList;
+      target.items=dstList;
+      if(appData.activeTab==="itinerary"){source.manualOrder=true;target.manualOrder=true;}
+      saveData(true);
+      render();
+    }
+    function cleanup(){
+      if(!drag)return;
+      drag.ghost?.remove();
+      drag.row.classList.remove("planner-moving");
+      indicators(null);
+      document.body.classList.remove("planner-sorting");
+      drag=null;
+    }
+    container.addEventListener("pointerdown",e=>{
+      const handle=e.target.closest(".planner-drag-handle");
+      if(!handle||!container.contains(handle)||drag||(e.pointerType==="mouse"&&e.button!==0))return;
+      const row=handle.closest(rowSelector),grp=handle.closest(groupSelector);
+      if(!row||!grp)return;
+      const rect=row.getBoundingClientRect();
+      drag={id:e.pointerId,handle,row,groupId:grp.dataset.groupId,itemId:row.dataset.itemId,
+        startX:e.clientX,startY:e.clientY,dx:e.clientX-rect.left,dy:e.clientY-rect.top,
+        width:rect.width,ghost:null,dest:null};
+      handle.setPointerCapture(e.pointerId);
+    });
+    container.addEventListener("pointermove",e=>{
+      const d=drag;
+      if(!d||e.pointerId!==d.id)return;
+      if(!d.ghost){
+        if(Math.hypot(e.clientX-d.startX,e.clientY-d.startY)<6)return;
+        const ghost=d.row.cloneNode(true);
+        ghost.classList.add("planner-drag-ghost");
+        ghost.style.width=d.width+"px";
+        ghost.setAttribute("aria-hidden","true");
+        document.body.appendChild(ghost);
+        d.ghost=ghost;
+        d.row.classList.add("planner-moving");
+        document.body.classList.add("planner-sorting");
+      }
+      e.preventDefault();
+      d.ghost.style.left=(e.clientX-d.dx)+"px";
+      d.ghost.style.top=(e.clientY-d.dy)+"px";
+      d.dest=targetAt(e.clientX,e.clientY);
+      indicators(d.dest);
+      const edge=50;
+      if(e.clientY<edge)window.scrollBy(0,-12);
+      else if(e.clientY>innerHeight-edge)window.scrollBy(0,12);
+    },{passive:false});
+    function finish(e,cancel){
+      const d=drag;
+      if(!d||d.id!==e.pointerId)return;
+      const moved=!!d.ghost,fromGroup=d.groupId,item=d.itemId;
+      const dest=cancel?null:(targetAt(e.clientX,e.clientY)||d.dest);
+      cleanup();
+      try{d.handle.releasePointerCapture(e.pointerId)}catch(_){}
+      if(moved&&dest)move(fromGroup,item,dest);
+    }
+    container.addEventListener("pointerup",e=>finish(e,false));
+    container.addEventListener("pointercancel",e=>finish(e,true));
+    window.addEventListener("blur",cleanup);
+  })();
 
   render();
   if (getSheetUrl()) {
