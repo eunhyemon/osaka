@@ -382,7 +382,7 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
     if (/이동|출발|도착|공항|라피트|체크아웃|복귀/.test(label || t)) {kind="move";name=name||"이동";}
     else if (/예약/.test(label || t)) {kind="reserve";name=name||"예약";}
     else if (/굿즈|쇼핑|아존|인형/.test(label || t)) {kind="shop";name=name||"쇼핑";}
-    else if (/스시|라멘|몬자|야키니쿠|저녁|점심|식사|타코야끼/.test(label || t)) {kind="food";name=name||"식사";}
+    else if (/스시|초밥|라멘|몬자|야키니쿠|저녁|점심|아침|식사|음식|맛집|타코야끼|우동|소바|돈카츠|규카츠|오코노미야키|이자카야|카페|커피|디저트/.test(label || t)) {kind="food";name="식사";}
     return {kind,name,title:tag?t.slice(tag[0].length):t};
   }
   function renderTimelineDay(group, index) {
