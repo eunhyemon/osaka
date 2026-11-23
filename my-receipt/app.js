@@ -352,7 +352,7 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
         Array.isArray(data.images) ? (typeof data.images[0] === "string" ? data.images[0] : data.images[0]?.src) : "";
       return {
         name: String(data.title).replace(/치이카와\s*클리닉/g, "클리닉"),
-        price: Number.isFinite(price) ? Math.round(price / 100) : null,
+        price: Number.isFinite(price) ? Math.round(price / 1000) : null, // 치이카와 마켓 상품 JSON은 표시 엔화 대비 1000배 단위
         img: typeof img === "string" && img ? (img.startsWith("//") ? "https:" + img : img) : "",
         url: parsed.origin + parsed.pathname
       };
