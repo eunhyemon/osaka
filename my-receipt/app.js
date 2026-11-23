@@ -323,10 +323,10 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
   }
   async function getShopifyProductData(rawUrl) {
     const parsed = new URL(rawUrl);
-    if (!/^https:$/.test(parsed.protocol) || !/^(www\\.)?chiikawamarket\\.jp$/.test(parsed.hostname)) {
+    if (!/^https:$/.test(parsed.protocol) || !/^(www\.)?chiikawamarket\.jp$/.test(parsed.hostname)) {
       throw new Error("현재 자동 불러오기는 치이카와 마켓 상품 링크를 지원하긔.");
     }
-    const match = parsed.pathname.match(/\\/products\\/([^/]+)/);
+    const match = parsed.pathname.match(/\/products\/([^/]+)/);
     if (!match) throw new Error("상품 상세 페이지 링크를 입력해주긔.");
     const productUrl = parsed.origin + "/products/" + encodeURIComponent(decodeURIComponent(match[1])) + ".js";
     const controller = new AbortController();
@@ -351,7 +351,7 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
         typeof data.featured_image?.src === "string" ? data.featured_image.src :
         Array.isArray(data.images) ? (typeof data.images[0] === "string" ? data.images[0] : data.images[0]?.src) : "";
       return {
-        name: String(data.title).replace(/치이카와\\s*클리닉/g, "클리닉"),
+        name: String(data.title).replace(/치이카와\s*클리닉/g, "클리닉"),
         price: Number.isFinite(price) ? Math.round(price / 100) : null,
         img: typeof img === "string" && img ? (img.startsWith("//") ? "https:" + img : img) : "",
         url: parsed.origin + parsed.pathname
