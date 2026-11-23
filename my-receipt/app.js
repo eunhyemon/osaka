@@ -457,6 +457,36 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
     return Math.round((jpy / 100) * appData.rate);
   }
 
+
+  // 치이카와 공식몰의 상품 이미지 URL (이미지 파일 업로드 불필요).
+  const clinicImageBase = "https://chiikawamarket.jp/cdn/shop/files/";
+  const clinicImageRules = [{"type":"간호사","char":"치이카와","file":"4571609408697_1.jpg"},{"type":"간호사","char":"하치와레","file":"4571609408703_1.jpg"},{"type":"간호사","char":"우사기","file":"4571609408710_1.jpg"},{"type":"간호사","char":"모몽가","file":"4571609408727_1.jpg"},{"type":"간호사","char":"쿠리만쥬","file":"4571609408734_1.jpg"},{"type":"간호사","char":"시사","file":"4571609408741_1.jpg"},{"type":"간호사","char":"랏코","file":"4571609408758_1.jpg"},{"type":"간호사","char":"카니","file":"4571609408765_1.jpg"},{"type":"간호사","char":"카부토무시","file":"4571609408772_1.jpg"},{"type":"간호사","char":"오데","file":"4571609408789_1.jpg"},{"type":"간호사","char":"갑옷","file":"4571609408796_1.jpg"},{"type":"간호사","char":"그 녀석","file":"4571609408802_1.jpg"},{"type":"의사","char":"우사기","file":"4571609408819_1.jpg"},{"type":"의사","char":"랏코","file":"4571609408826_1.jpg"},{"type":"장기","char":"치이카와","file":"4571609412793_1.jpg"},{"type":"장기","char":"하치와레","file":"4571609412809_1.jpg"},{"type":"장기","char":"우사기","file":"4571609412816_1.jpg"},{"type":"비즈","char":"치이카와","file":"4571609412762.jpg"},{"type":"비즈","char":"하치와레","file":"4571609412779.jpg"},{"type":"비즈","char":"우사기","file":"4571609412786.jpg"},{"type":"파우치","char":"치이카와","file":"4571609416265_1.jpg"},{"type":"파우치","char":"하치와레","file":"4571609416272_1.jpg"},{"type":"파우치","char":"우사기","file":"4571609416289_1_68771769-a71b-49f2-8869-7fd12dabe7e4.jpg"}];
+  const clinicOtherImages = [{"keyword":"바이러스","file":"4571609409847_0_f9ce02dc-e1ce-40a4-bb8d-3e56e5a9622e.jpg"},{"keyword":"고블린","file":"4571609409830_0.jpg"},{"keyword":"미니 케이스","file":"4571609416135_1.jpg"},{"keyword":"포스터","file":"4571609416289_1.jpg"},{"keyword":"마시멜로","file":"4571609417170_1.jpg"},{"keyword":"엑스레이","file":"4571609415176_1.jpg"},{"keyword":"약봉투","file":"4571609415183_1_2c86b885-f892-4b61-9c47-280d65611897.jpg"},{"keyword":"멀티 케이스","file":"4571609416234_1.jpg"},{"keyword":"시력검사","file":"4571609416227_1.jpg"}];
+  function clinicImageFor(item) {
+    const name = String(item.name || "");
+    if (!/클리닉|clinic/i.test(name)) return "";
+    const normalized = name.replace(/의사\s*시사/g, "간호사 시사");
+    const aliases = {
+      "하치와레":["하치와레","가르마"], "우사기":["우사기","토끼"],
+      "모몽가":["모몽가","하늘다람쥐"], "쿠리만쥬":["쿠리만쥬","밤만쥬"],
+      "랏코":["랏코","해달"], "카니":["카니","헌책방"],
+      "카부토무시":["카부토무시","풍뎅이","딱정벌레"],
+      "갑옷":["갑옷","갑옷상"], "그 녀석":["그 녀석","그아이","그 아이"]
+    };
+    const has = char => (aliases[char] || [char]).some(alias => normalized.includes(alias));
+    const kind = /비즈|스트랩/.test(normalized) ? "비즈" :
+      /장기|심장|위\b|폐\b|자기/.test(normalized) ? "장기" :
+      /파우치|약이 되어/.test(normalized) && !/약봉투|엑스레이/.test(normalized) ? "파우치" :
+      /의사/.test(normalized) ? "의사" : "간호사";
+    const match = clinicImageRules.find(x => x.type === kind && has(x.char));
+    if (match) return clinicImageBase + match.file + "?width=533";
+    const other = clinicOtherImages.find(x => normalized.includes(x.keyword));
+    return other ? clinicImageBase + other.file + "?width=533" : "";
+  }
+  function displayItemName(item) {
+    return String(item.name || "").replace(/의사\s*시사/g, "간호사 시사");
+  }
+
   function render() {
     document.getElementById("rate-input").value = appData.rate;
     const isShopping = appData.activeTab === "shopping";
@@ -514,14 +544,15 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
         const qtyBadgeHtml = qty > 1 ? `<span class="qty-badge">x${qty}</span>` : "";
 
         if (isShopping) {
-          const thumbHtml = item.img ? `<img src="${item.img}" alt="">` : `+📷`;
+          const effectiveImg = item.img || clinicImageFor(item);
+          const thumbHtml = effectiveImg ? `<img src="${effectiveImg}" alt="" loading="lazy" onerror="this.style.display=\'none\'">` : `+📷`;
           itemsHtml += `
             <div class="item-row ${item.checked ? "checked" : ""}">
               <button type="button" class="item-drag-handle" aria-label="항목 드래그해서 이동" title="길게 잡아 이동">⠿</button>
               <input type="checkbox" class="item-check" ${item.checked ? "checked" : ""} onchange="toggleItem('${cat.id}', '${item.id}')">
-              <div class="item-thumb ${item.img ? "has-img" : ""}" onclick="handleThumbClick('${cat.id}', '${item.id}')">${thumbHtml}</div>
+              <div class="item-thumb ${effectiveImg ? "has-img" : ""}" onclick="handleThumbClick('${cat.id}', '${item.id}')">${thumbHtml}</div>
               <div class="item-info">
-                <div class="item-name" onclick="toggleItem('${cat.id}', '${item.id}')" style="cursor:pointer;">${item.name}${qtyBadgeHtml}</div>
+                <div class="item-name" onclick="toggleItem('${cat.id}', '${item.id}')" style="cursor:pointer;">${displayItemName(item)}${qtyBadgeHtml}</div>
                 ${item.memo ? `<div class="item-memo">${item.memo}</div>` : ""}
                 <div class="qty-stepper" onclick="event.stopPropagation()">
                   <button type="button" class="qty-step-btn" onclick="changeItemQty('${cat.id}', '${item.id}', -1)">-</button>
