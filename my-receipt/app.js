@@ -317,9 +317,73 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
     openModal(catId, itemId);
   }
 
+
+  function setProductFetchStatus(message) {
+    document.getElementById("product-fetch-status").textContent = message;
+  }
+  async function getShopifyProductData(rawUrl) {
+    const parsed = new URL(rawUrl);
+    if (!/^https:$/.test(parsed.protocol) || !/^(www\\.)?chiikawamarket\\.jp$/.test(parsed.hostname)) {
+      throw new Error("현재 자동 불러오기는 치이카와 마켓 상품 링크를 지원하긔.");
+    }
+    const match = parsed.pathname.match(/\\/products\\/([^/]+)/);
+    if (!match) throw new Error("상품 상세 페이지 링크를 입력해주긔.");
+    const productUrl = parsed.origin + "/products/" + encodeURIComponent(decodeURIComponent(match[1])) + ".js";
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 9000);
+    try {
+      let data;
+      try {
+        const response = await fetch(productUrl, {signal:controller.signal});
+        if (!response.ok) throw new Error("상품 응답 오류");
+        data = await response.json();
+      } catch (directError) {
+        // GitHub Pages에서 외부 쇼핑몰의 CORS 정책이 허용되지 않는 경우의 공개 URL 프록시.
+        const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(productUrl);
+        const response = await fetch(proxy, {signal:controller.signal});
+        if (!response.ok) throw new Error("상품 정보 요청 실패");
+        data = await response.json();
+      }
+      if (!data || !data.title || !Array.isArray(data.variants)) throw new Error("상품 응답 형식이 올바르지 않긔.");
+      const variant = data.variants.find(x => x.available) || data.variants[0];
+      const price = Number(variant && variant.price);
+      const img = typeof data.featured_image === "string" ? data.featured_image :
+        typeof data.featured_image?.src === "string" ? data.featured_image.src :
+        Array.isArray(data.images) ? (typeof data.images[0] === "string" ? data.images[0] : data.images[0]?.src) : "";
+      return {
+        name: String(data.title).replace(/치이카와\\s*클리닉/g, "클리닉"),
+        price: Number.isFinite(price) ? Math.round(price / 100) : null,
+        img: typeof img === "string" && img ? (img.startsWith("//") ? "https:" + img : img) : "",
+        url: parsed.origin + parsed.pathname
+      };
+    } finally { clearTimeout(timer); }
+  }
+  async function fetchProductFromUrl() {
+    const rawUrl = document.getElementById("edit-product-url").value.trim();
+    if (!rawUrl) { setProductFetchStatus("먼저 상품 링크를 입력해주긔."); return; }
+    const btn = document.getElementById("fetch-product-btn");
+    btn.disabled = true;
+    btn.textContent = "불러오는 중";
+    setProductFetchStatus("공식 상품 정보를 조회하고 있긔.");
+    try {
+      const data = await getShopifyProductData(rawUrl);
+      document.getElementById("edit-name").value = data.name;
+      if (data.price !== null) document.getElementById("edit-price").value = data.price;
+      if (data.img) document.getElementById("edit-img").value = data.img;
+      setProductFetchStatus("상품명·가격" + (data.img ? "·이미지" : "") + "를 불러왔긔. 확인 후 저장해주긔.");
+    } catch (error) {
+      setProductFetchStatus("자동 불러오기 실패: " + (error.message || "사이트의 외부 접근 제한") + " 기존 칸에서 직접 등록할 수 있긔.");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "정보 불러오기";
+    }
+  }
+
   function openModal(catId, itemId = null) {
     editingTarget = { catId, itemId };
     const isShopping = appData.activeTab === "shopping";
+    document.getElementById("product-url-group").style.display = isShopping ? "block" : "none";
+    setProductFetchStatus("");
     document.getElementById("price-group").style.display = isShopping ? "block" : "none";
     document.getElementById("img-group").style.display = isShopping ? "block" : "none";
     document.getElementById("price-qty-row").style.gridTemplateColumns = isShopping ? "2fr 1fr" : "1fr";
@@ -334,6 +398,7 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
       const cat = appData[appData.activeTab].find(c => c.id === catId);
       const item = cat.items.find(i => i.id === itemId);
       document.getElementById("modal-title").textContent = "품목 수정";
+      document.getElementById("edit-product-url").value = item.url || "";
       document.getElementById("edit-name").value = displayItemName(item);
       document.getElementById("edit-price").value = item.price || "";
       document.getElementById("edit-qty").value = item.qty || 1;
@@ -342,6 +407,7 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
       document.getElementById("modal-del-btn").style.display = "block";
     } else {
       document.getElementById("modal-title").textContent = "새 품목 추가";
+      document.getElementById("edit-product-url").value = "";
       document.getElementById("edit-name").value = "";
       document.getElementById("edit-price").value = "";
       document.getElementById("edit-qty").value = 1;
@@ -367,6 +433,7 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
     const qty = Math.max(1, parseInt(document.getElementById("edit-qty").value, 10) || 1);
     const memo = document.getElementById("edit-memo").value.trim();
     const img = document.getElementById("edit-img").value.trim();
+    const url = document.getElementById("edit-product-url").value.trim();
 
     const cat = appData[appData.activeTab].find(c => c.id === editingTarget.catId);
     if (editingTarget.itemId) {
@@ -376,6 +443,7 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
       item.qty = qty;
       item.memo = memo;
       item.img = img;
+      item.url = url;
     } else {
       cat.items.push({
         id: "item_" + Date.now(),
@@ -384,6 +452,7 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
         qty,
         memo,
         img,
+        url,
         checked: false
       });
     }
