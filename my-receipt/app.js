@@ -75,15 +75,49 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
         const currentTab = appData.activeTab;
         appData = cloudData;
         appData.activeTab = currentTab;
+        const migrated = migrateClinicProducts20261123();
         localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
         render();
-        setSyncUI("online", "구글 시트 연결됨 (최신 상태)");
+        if (migrated) await saveData(true);
+        else setSyncUI("online", "구글 시트 연결됨 (최신 상태)");
       } else {
         await saveData(true);
       }
     } catch (err) {
       setSyncUI("error", "시트 연결 확인 필요");
     }
+  }
+
+
+  const newClinicProducts20261123 = [{"id":"clinic_4571609416784","name":"클리닉 마이넘버 카드 케이스 (의사 우사기)","price":550,"qty":1,"memo":"상품번호 4571609416784","img":"https://chiikawamarket.jp/cdn/shop/files/4571609416784_1.jpg?v=1794294140&width=600","checked":false},{"id":"clinic_4571609416753","name":"클리닉 약수첩 & 진찰권 커버 (간호사 친구들)","price":1100,"qty":1,"memo":"상품번호 4571609416753","img":"https://chiikawamarket.jp/cdn/shop/files/4571609416753_1.jpg?v=1794294274&width=600","checked":false},{"id":"clinic_4571609416357","name":"클리닉 백전백승 부적","price":990,"qty":1,"memo":"상품번호 4571609416357","img":"https://chiikawamarket.jp/cdn/shop/files/4571609416357_1.jpg?v=1794361532&width=600","checked":false}];
+  const newClinicImageMap20261123 = {"clinic_4571609416784":"https://chiikawamarket.jp/cdn/shop/files/4571609416784_1.jpg?v=1794294140&width=600","clinic_4571609416753":"https://chiikawamarket.jp/cdn/shop/files/4571609416753_1.jpg?v=1794294274&width=600","clinic_4571609416357":"https://chiikawamarket.jp/cdn/shop/files/4571609416357_1.jpg?v=1794361532&width=600"};
+  function migrateClinicProducts20261123() {
+    if (!Array.isArray(appData.shopping)) return false;
+    let changed = false;
+    appData.shopping.forEach(cat => {
+      (cat.items || []).forEach(item => {
+        const renamed = String(item.name || "").replace(/치이카와\s*클리닉/g, "클리닉").replace(/의사\s*시사/g, "간호사 시사");
+        if (renamed !== item.name) { item.name = renamed; changed = true; }
+      });
+    });
+    if (appData.clinicProducts20261123Added) return changed;
+    let hobby = appData.shopping.find(cat => /취미/.test(cat.name || cat.title || ""));
+    if (!hobby) {
+      hobby = { id: "cat_clinic_hobby_20261123", name: "취미", items: [] };
+      appData.shopping.push(hobby);
+      changed = true;
+    }
+    for (const item of newClinicProducts20261123) {
+      const sku = item.id.replace("clinic_", "");
+      if (!appData.shopping.some(cat => (cat.items || []).some(existing =>
+        existing.id === item.id || String(existing.memo || "").includes(sku)
+      ))) {
+        hobby.items.push({ ...item });
+        changed = true;
+      }
+    }
+    appData.clinicProducts20261123Added = true;
+    return true;
   }
 
   function resetAllData() {
@@ -463,6 +497,8 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
   const clinicImageRules = [{"type":"간호사","char":"치이카와","file":"4571609408697_1.jpg"},{"type":"간호사","char":"하치와레","file":"4571609408703_1.jpg"},{"type":"간호사","char":"우사기","file":"4571609408710_1.jpg"},{"type":"간호사","char":"모몽가","file":"4571609408727_1.jpg"},{"type":"간호사","char":"쿠리만쥬","file":"4571609408734_1.jpg"},{"type":"간호사","char":"시사","file":"4571609408741_1.jpg"},{"type":"간호사","char":"랏코","file":"4571609408758_1.jpg"},{"type":"간호사","char":"카니","file":"4571609408765_1.jpg"},{"type":"간호사","char":"카부토무시","file":"4571609408772_1.jpg"},{"type":"간호사","char":"오데","file":"4571609408789_1.jpg"},{"type":"간호사","char":"갑옷","file":"4571609408796_1.jpg"},{"type":"간호사","char":"그 녀석","file":"4571609408802_1.jpg"},{"type":"의사","char":"우사기","file":"4571609408819_1.jpg"},{"type":"의사","char":"랏코","file":"4571609408826_1.jpg"},{"type":"장기","char":"치이카와","file":"4571609412793_1.jpg"},{"type":"장기","char":"하치와레","file":"4571609412809_1.jpg"},{"type":"장기","char":"우사기","file":"4571609412816_1.jpg"},{"type":"비즈","char":"치이카와","file":"4571609412762.jpg"},{"type":"비즈","char":"하치와레","file":"4571609412779.jpg"},{"type":"비즈","char":"우사기","file":"4571609412786.jpg"},{"type":"파우치","char":"치이카와","file":"4571609416265_1.jpg"},{"type":"파우치","char":"하치와레","file":"4571609416272_1.jpg"},{"type":"파우치","char":"우사기","file":"4571609416289_1_68771769-a71b-49f2-8869-7fd12dabe7e4.jpg"}];
   const clinicOtherImages = [{"keyword":"바이러스","file":"4571609409847_0_f9ce02dc-e1ce-40a4-bb8d-3e56e5a9622e.jpg"},{"keyword":"고블린","file":"4571609409830_0.jpg"},{"keyword":"미니 케이스","file":"4571609416135_1.jpg"},{"keyword":"포스터","file":"4571609416289_1.jpg"},{"keyword":"마시멜로","file":"4571609417170_1.jpg"},{"keyword":"엑스레이","file":"4571609415176_1.jpg"},{"keyword":"약봉투","file":"4571609415183_1_2c86b885-f892-4b61-9c47-280d65611897.jpg"},{"keyword":"멀티 케이스","file":"4571609416234_1.jpg"},{"keyword":"시력검사","file":"4571609416227_1.jpg"}];
   function clinicImageFor(item) {
+    const skuImage = newClinicImageMap20261123[item.id];
+    if (skuImage) return skuImage;
     const name = String(item.name || "");
     if (!/클리닉|clinic/i.test(name)) return "";
     const normalized = name.replace(/의사\s*시사/g, "간호사 시사").replace(/치이카와\s*클리닉/gi, "클리닉").replace(/ちいかわ\s*クリニック/g, "클리닉");
@@ -750,6 +786,9 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
     window.addEventListener("blur", () => cleanup());
   })();
 
+  if (migrateClinicProducts20261123()) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+  }
   render();
   if (getSheetUrl()) {
     syncFromSheet();
