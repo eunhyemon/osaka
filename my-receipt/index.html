@@ -96,6 +96,14 @@
 <div class="modal-backdrop" id="item-modal">
   <div class="modal">
     <h3 id="modal-title">품목 수정</h3>
+    <div class="form-group" id="product-url-group">
+      <label for="edit-product-url">상품 링크 (선택)</label>
+      <div class="img-helper-row" style="align-items:stretch;">
+        <input type="url" id="edit-product-url" placeholder="치이카와 마켓 상품 URL 붙여넣기" style="flex:1;min-width:0;">
+        <button type="button" class="small-btn" id="fetch-product-btn" onclick="fetchProductFromUrl()">정보 불러오기</button>
+      </div>
+      <div id="product-fetch-status" role="status" aria-live="polite" style="font-size:11px;color:var(--muted);margin-top:5px;"></div>
+    </div>
     <div class="form-group">
       <label>품목명</label>
       <input type="text" id="edit-name" placeholder="예: 말차소금">
@@ -188,6 +196,6 @@ function doPost(e) {
   </div>
 </div>
 
-<script src="./app.js?v=clinic-poster-6913"></script>
+<script src="./app.js?v=product-url-import-20261123"></script>
 </body>
 </html>
