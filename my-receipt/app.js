@@ -297,7 +297,7 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
     const item = cat.items.find(i => i.id === itemId);
     if (item && (clinicImageFor(item) || item.img)) {
       previewTarget = { catId, itemId };
-      document.getElementById("preview-img-el").src = clinicImageFor(item) || item.img;
+      document.getElementById("preview-img-el").src = (item.url && item.img) || clinicImageFor(item) || item.img;
       document.getElementById("preview-title-el").textContent = displayItemName(item);
       document.getElementById("img-preview-modal").classList.add("open");
     } else {
@@ -665,7 +665,7 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
         const qtyBadgeHtml = qty > 1 ? `<span class="qty-badge">x${qty}</span>` : "";
 
         if (isShopping) {
-          const effectiveImg = clinicImageFor(item) || item.img;
+          const effectiveImg = (item.url && item.img) || clinicImageFor(item) || item.img;
           const thumbHtml = effectiveImg ? `<img src="${effectiveImg}" alt="" loading="lazy" onerror="this.style.display=\'none\'">` : `+📷`;
           itemsHtml += `
             <div class="item-row ${item.checked ? "checked" : ""}">
