@@ -246,10 +246,10 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
   function handleThumbClick(catId, itemId) {
     const cat = appData[appData.activeTab].find(c => c.id === catId);
     const item = cat.items.find(i => i.id === itemId);
-    if (item && item.img) {
+    if (item && (item.img || clinicImageFor(item))) {
       previewTarget = { catId, itemId };
-      document.getElementById("preview-img-el").src = item.img;
-      document.getElementById("preview-title-el").textContent = item.name;
+      document.getElementById("preview-img-el").src = item.img || clinicImageFor(item);
+      document.getElementById("preview-title-el").textContent = displayItemName(item);
       document.getElementById("img-preview-modal").classList.add("open");
     } else {
       openModal(catId, itemId);
@@ -285,11 +285,11 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
       const cat = appData[appData.activeTab].find(c => c.id === catId);
       const item = cat.items.find(i => i.id === itemId);
       document.getElementById("modal-title").textContent = "품목 수정";
-      document.getElementById("edit-name").value = item.name;
+      document.getElementById("edit-name").value = displayItemName(item);
       document.getElementById("edit-price").value = item.price || "";
       document.getElementById("edit-qty").value = item.qty || 1;
       document.getElementById("edit-memo").value = item.memo || "";
-      document.getElementById("edit-img").value = item.img || "";
+      document.getElementById("edit-img").value = item.img || clinicImageFor(item) || "";
       document.getElementById("modal-del-btn").style.display = "block";
     } else {
       document.getElementById("modal-title").textContent = "새 품목 추가";
