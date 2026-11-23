@@ -246,9 +246,9 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
   function handleThumbClick(catId, itemId) {
     const cat = appData[appData.activeTab].find(c => c.id === catId);
     const item = cat.items.find(i => i.id === itemId);
-    if (item && (item.img || clinicImageFor(item))) {
+    if (item && (clinicImageFor(item) || item.img)) {
       previewTarget = { catId, itemId };
-      document.getElementById("preview-img-el").src = item.img || clinicImageFor(item);
+      document.getElementById("preview-img-el").src = clinicImageFor(item) || item.img;
       document.getElementById("preview-title-el").textContent = displayItemName(item);
       document.getElementById("img-preview-modal").classList.add("open");
     } else {
@@ -465,7 +465,7 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
   function clinicImageFor(item) {
     const name = String(item.name || "");
     if (!/클리닉|clinic/i.test(name)) return "";
-    const normalized = name.replace(/의사\s*시사/g, "간호사 시사");
+    const normalized = name.replace(/의사\s*시사/g, "간호사 시사").replace(/치이카와\s*클리닉/gi, "클리닉").replace(/ちいかわ\s*クリニック/g, "클리닉");
     const aliases = {
       "하치와레":["하치와레","가르마"], "우사기":["우사기","토끼"],
       "모몽가":["모몽가","하늘다람쥐"], "쿠리만쥬":["쿠리만쥬","밤만쥬"],
@@ -544,7 +544,7 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
         const qtyBadgeHtml = qty > 1 ? `<span class="qty-badge">x${qty}</span>` : "";
 
         if (isShopping) {
-          const effectiveImg = item.img || clinicImageFor(item);
+          const effectiveImg = clinicImageFor(item) || item.img;
           const thumbHtml = effectiveImg ? `<img src="${effectiveImg}" alt="" loading="lazy" onerror="this.style.display=\'none\'">` : `+📷`;
           itemsHtml += `
             <div class="item-row ${item.checked ? "checked" : ""}">
