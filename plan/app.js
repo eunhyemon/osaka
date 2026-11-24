@@ -84,15 +84,43 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
         const currentTab = appData.activeTab;
         appData = cloudData;
         appData.activeTab = currentTab;
+        const addedStop = addNaniwaCameraStop();
         localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
         render();
-        setSyncUI("online", "구글 시트 연결됨 (최신 상태)");
+        if (addedStop) await saveData(true);
+        else setSyncUI("online", "구글 시트 연결됨 (최신 상태)");
       } else {
         await saveData(true);
       }
     } catch (err) {
       setSyncUI("error", "시트 연결 확인 필요");
     }
+  }
+
+
+  // One-time, non-destructive addition to the existing synced itinerary.
+  function addNaniwaCameraStop() {
+    if (!Array.isArray(appData.itinerary)) return false;
+    const entryId = "stop_naniwa_camera_umeda_20261130";
+    if (appData.itinerary.some(group => (group.items || []).some(item =>
+      item.id === entryId || /카메라\s*노\s*나니와|カメラのナニワ/.test(String(item.title || ""))
+    ))) return false;
+
+    // Prefer a group explicitly labeled November 30; avoid placing it on December 1.
+    let group = appData.itinerary.find(group => /11[./월\s-]*30|11월\s*30일|2026-11-30/.test(String(group.title || "")));
+    if (!group) group = appData.itinerary.find(group => /Day\s*2\b/i.test(String(group.title || "")) && /우메다/.test(String(group.title || "")));
+    if (!group) {
+      group = {id:"day_20261130_umeda",title:"📅 11/30 (월) · 우메다",items:[]};
+      appData.itinerary.push(group);
+    }
+    group.items.push({
+      id: entryId,
+      title:"카메라노나니와 우메다 2호점",
+      time:"",
+      memo:"우메다 쇼핑 동선 · 중고 카메라 구경 (약 30~60분) / 오사카 기타구 시바타 2-1-3 우메센도 빌딩 5F",
+      completed:false
+    });
+    return true;
   }
 
   function resetAllData() {
@@ -632,6 +660,7 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
     window.addEventListener("blur",cleanup);
   })();
 
+  if (addNaniwaCameraStop()) localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
   render();
   if (getSheetUrl()) {
     syncFromSheet();
