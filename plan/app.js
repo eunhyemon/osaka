@@ -461,7 +461,7 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
       parent.appendChild(document.createTextNode(text));
       return;
     }
-    const linePattern = /\\[([^\\]\\n]+)\\]/g;
+    const linePattern = /\[([^\]\n]+)\]/g;
     let from = 0;
     for (const match of text.matchAll(linePattern)) {
       const line = match[1].trim();
