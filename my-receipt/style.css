@@ -899,3 +899,12 @@ body.is-sorting{cursor:grabbing}
   .item-row{gap:6px}
   .item-drag-handle{flex-basis:17px;width:17px;min-width:17px;font-size:22px}
 }
+
+/* Minimal duplicate/edit action pair. */
+.item-quick-actions{display:flex;align-items:center;justify-content:flex-end;gap:1px;flex-shrink:0}
+.item-quick-actions .item-edit-btn,.item-quick-actions .item-duplicate-btn{width:24px;height:28px;display:inline-flex;align-items:center;justify-content:center;padding:0;border:0;background:transparent;color:#777;font-size:14px;line-height:1;cursor:pointer}
+.item-quick-actions .item-duplicate-btn{position:relative}
+.item-quick-actions .item-duplicate-btn::before,.item-quick-actions .item-duplicate-btn::after{content:"";position:absolute;width:10px;height:11px;border:1.3px solid currentColor;border-radius:1px;background:var(--bg)}
+.item-quick-actions .item-duplicate-btn::before{transform:translate(-2px,-2px)}
+.item-quick-actions .item-duplicate-btn::after{transform:translate(2px,2px)}
+.item-quick-actions button:hover{color:var(--ink)}
