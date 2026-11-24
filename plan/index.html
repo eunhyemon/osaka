@@ -96,8 +96,12 @@
     </div>
 
     <div class="form-group">
-      <label>메모 / 구글맵 URL (링크 입력 시 자동 클릭 가능)</label>
-      <input type="text" id="edit-memo" placeholder="예: 15:00 체크인 / https://maps.app.goo.gl/...">
+      <label for="edit-map-url">지도 / 관련 URL (선택)</label>
+      <input type="url" id="edit-map-url" placeholder="https://maps.app.goo.gl/... 또는 관련 링크">
+    </div>
+    <div class="form-group">
+      <label for="edit-memo">메모</label>
+      <textarea id="edit-memo" rows="3" placeholder="예: 쇼핑할 물건, 예약 참고사항 등" style="width:100%;box-sizing:border-box;resize:vertical;"></textarea>
     </div>
     <div class="modal-btns">
       <button type="button" class="btn-delete" id="modal-del-btn" onclick="deleteCurrentItem()" style="display:none;">삭제</button>
@@ -151,6 +155,6 @@ function doPost(e) {
   </div>
 </div>
 
-<script src="./app.js?v=naniwa-camera-nov30-20261124"></script>
+<script src="./app.js?v=separate-url-memo-20261124"></script>
 </body>
 </html>
