@@ -776,7 +776,13 @@
 .route-title-line{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 6px;line-height:1.4}
 .route-title{font-size:14px;font-weight:700;overflow-wrap:anywhere;word-break:keep-all}
 .route-category{color:var(--route-color);font-size:10px;white-space:nowrap;font-weight:700}
-.route-move .route-title{font-weight:400;color:var(--muted)}
+/* Movement is an active itinerary step, not a disabled row. */
+.route-move{--route-color:var(--ink)}
+.route-move .route-title{font-weight:600;color:var(--ink)}
+.route-move .route-category{display:inline-flex;align-items:center;gap:4px;border:1px solid currentColor;border-radius:2px;padding:1px 4px;color:var(--ink);font-size:10px;line-height:1.25}
+.route-move .route-category::before{content:"→";font-size:11px;font-weight:700;line-height:1}
+.route-move .route-dot{background:var(--bg)}
+
 .route-memo{font-size:11px;line-height:1.6;color:var(--muted);margin-top:4px;overflow-wrap:anywhere;white-space:pre-wrap}
 .route-memo a{color:var(--riso-green);font-size:11px;font-weight:700;text-decoration:none;border-bottom:1px solid currentColor;margin-right:5px}
 .route-actions{display:flex;align-items:center;justify-content:flex-end;gap:3px}
