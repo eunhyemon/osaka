@@ -461,6 +461,25 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
     render();
   }
 
+  function duplicateItem(catId, itemId) {
+    const cat = appData[appData.activeTab].find(c => c.id === catId);
+    if (!cat) return;
+    const index = cat.items.findIndex(item => item.id === itemId);
+    if (index < 0) return;
+    const source = cat.items[index];
+    const copy = {
+      ...source,
+      id: "item_copy_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8),
+      checked: false
+    };
+    if (appData.activeTab === "shopping" && !copy.img) {
+      copy.img = clinicImageFor(source) || "";
+    }
+    cat.items.splice(index + 1, 0, copy);
+    saveData(true);
+    render();
+  }
+
   function deleteCurrentItem() {
     if (!editingTarget || !editingTarget.itemId) return;
     const cat = appData[appData.activeTab].find(c => c.id === editingTarget.catId);
@@ -686,7 +705,7 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
                 ${qty > 1 ? `<div class="price-unit-sub">¥${unitPrice.toLocaleString()}×${qty}</div>` : ""}
                 <div class="price-krw">${toKrw(lineJpy).toLocaleString()}원</div>
               </div>
-              <button class="item-edit-btn" onclick="openModal('${cat.id}', '${item.id}')">✎</button>
+              <div class="item-quick-actions"><button type="button" class="item-duplicate-btn" title="이 항목 복제" aria-label="항목 복제" onclick="duplicateItem('${cat.id}', '${item.id}')"></button><button type="button" class="item-edit-btn" title="항목 수정" aria-label="항목 수정" onclick="openModal('${cat.id}', '${item.id}')">✎</button></div>
             </div>
           `;
         } else {
@@ -698,7 +717,7 @@ const STORAGE_KEY = "osaka_receipt_hailey_v1";
                 <div class="item-name">${item.name}${qtyBadgeHtml}</div>
                 ${item.memo ? `<div class="item-memo">${item.memo}</div>` : ""}
               </div>
-              <button class="item-edit-btn" onclick="openModal('${cat.id}', '${item.id}')">✎</button>
+              <div class="item-quick-actions"><button type="button" class="item-duplicate-btn" title="이 항목 복제" aria-label="항목 복제" onclick="duplicateItem('${cat.id}', '${item.id}')"></button><button type="button" class="item-edit-btn" title="항목 수정" aria-label="항목 수정" onclick="openModal('${cat.id}', '${item.id}')">✎</button></div>
             </div>
           `;
         }
