@@ -174,6 +174,31 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
     render();
   }
 
+
+  // Existing combined memo/URL values remain readable without overwriting synced data.
+  function separateMemoAndUrl(item) {
+    const raw = String(item.memo || "");
+    const explicitUrl = String(item.mapUrl || "").trim();
+    if (explicitUrl) return {memo:raw, url:explicitUrl};
+    const found = raw.match(/https?:\/\/[^\s<>]+/);
+    if (!found) return {memo:raw, url:""};
+    const url = found[0].replace(/[),.;]+$/,"");
+    const memo = raw.replace(found[0],"").replace(/^\s*[|/·\-]+\s*|\s*[|/·\-]+\s*$/g,"").trim();
+    return {memo,url};
+  }
+  function createPlannerUrlLink(url) {
+    try {
+      const parsed = new URL(url);
+      if (!/^https?:$/.test(parsed.protocol)) return null;
+      const link = document.createElement("a");
+      link.href = parsed.href;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = /maps\.app\.goo\.gl|google\.[^/]+\/maps|maps\.google/.test(parsed.href) ? "지도 ↗" : "링크 ↗";
+      return link;
+    } catch(e) { return null; }
+  }
+
   function openModal(groupId = null, itemId = null) {
     editingTarget = { groupId, itemId };
     const groups = appData[appData.activeTab];
@@ -207,7 +232,9 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
       document.getElementById("edit-date").value = item.date || "";
       document.getElementById("edit-status").value = item.status || "미예약";
       document.getElementById("edit-time").value = item.time || "";
-      document.getElementById("edit-memo").value = item.memo || "";
+      const split = separateMemoAndUrl(item);
+      document.getElementById("edit-memo").value = split.memo;
+      document.getElementById("edit-map-url").value = split.url;
       document.getElementById("modal-del-btn").style.display = "block";
     } else {
       document.getElementById("edit-title").value = "";
@@ -215,6 +242,7 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
       document.getElementById("edit-status").value = "미예약";
       document.getElementById("edit-time").value = "12:00";
       document.getElementById("edit-memo").value = "";
+      document.getElementById("edit-map-url").value = "";
       document.getElementById("modal-del-btn").style.display = "none";
     }
 
@@ -238,6 +266,8 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
     const status = document.getElementById("edit-status").value;
     const time = document.getElementById("edit-time").value;
     const memo = document.getElementById("edit-memo").value.trim();
+    const mapUrl = document.getElementById("edit-map-url").value.trim();
+    if (mapUrl && !/^https?:\/\//i.test(mapUrl)) { alert("URL은 https:// 로 시작해야 합니다."); return; }
 
     const groups = appData[appData.activeTab];
     const targetGroup = groups.find(g => g.id === groupId);
@@ -253,6 +283,7 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
         item.time = time;
       }
       item.memo = memo;
+      item.mapUrl = mapUrl;
 
       if (editingTarget.groupId !== groupId) {
         origGroup.items = origGroup.items.filter(i => i.id !== editingTarget.itemId);
@@ -263,6 +294,7 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
         id: "item_" + Date.now(),
         title,
         memo,
+        mapUrl,
         completed: false
       };
       if (isBooking) {
@@ -445,10 +477,18 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
       const handle=document.createElement("button");handle.type="button";handle.className="planner-drag-handle";handle.textContent="⠿";
       handle.title="잡아서 일정 이동";handle.setAttribute("aria-label",cat.title+" 순서 또는 날짜 이동");
       body.prepend(handle);body.appendChild(top);
-      if(item.memo){
-        const memo=document.createElement("div");memo.className="route-memo";
-        const parts=String(item.memo).split(/(https?:\/\/[^\s]+)/g);
-        for(const part of parts){if(/^https?:\/\//.test(part)){const a=document.createElement("a");a.href=part;a.target="_blank";a.rel="noopener noreferrer";a.textContent=/maps\.app\.goo\.gl|google\.[^/]+\/maps|maps\.google/.test(part)?"지도 ↗":"링크 ↗";memo.appendChild(a);}else memo.appendChild(document.createTextNode(part));}
+      const details = separateMemoAndUrl(item);
+      if (details.memo || details.url) {
+        const memo = document.createElement("div"); memo.className = "route-memo";
+        if (details.url) {
+          const link = createPlannerUrlLink(details.url);
+          if (link) memo.appendChild(link);
+        }
+        if (details.memo) {
+          const note = document.createElement("span");
+          note.textContent = details.memo;
+          memo.appendChild(note);
+        }
         body.appendChild(memo);
       }
       const actions=document.createElement("div");actions.className="route-actions";
@@ -499,7 +539,7 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
                   '<div class="item-title">' + item.title + '</div>' +
                 '</div>' +
                 (item.date ? '<div class="item-details"><span>🗓️ ' + item.date + '</span></div>' : '') +
-                (item.memo ? '<div class="item-memo">' + linkify(item.memo) + '</div>' : '') +
+                ((item.memo || item.mapUrl) ? '<div class="item-memo">' + linkify([separateMemoAndUrl(item).url, separateMemoAndUrl(item).memo].filter(Boolean).join(" ")) + '</div>' : '') +
                 '<div class="item-controls">' +
                   '<button type="button" class="item-sub-btn" onclick="openModal(\'' + group.id + '\', \'' + item.id + '\')">수정/삭제</button>' +
                 '</div>' +
