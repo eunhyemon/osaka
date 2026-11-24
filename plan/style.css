@@ -823,3 +823,30 @@ body.planner-sorting{cursor:grabbing}
   .planner-drag-handle{width:16px;min-width:16px;font-size:21px}
   .route-body{padding-left:17px}
 }
+
+/* Subway lines: minimal stripe labels within movement memo only. */
+.subway-line-chip{
+  --line-accent:#555;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  vertical-align:baseline;
+  border:1px solid #dedede;
+  border-radius:2px;
+  padding:1px 5px 1px 4px;
+  color:var(--ink);
+  background:var(--bg);
+  font-size:10px;
+  font-weight:600;
+  line-height:1.4;
+  white-space:nowrap;
+}
+.subway-line-chip::before{
+  content:"";
+  display:inline-block;
+  flex:none;
+  width:3px;
+  height:12px;
+  border-radius:1px;
+  background:var(--line-accent);
+}
