@@ -445,6 +445,39 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
     else if (/스시|초밥|라멘|몬자|야키니쿠|저녁|점심|아침|식사|음식|맛집|타코야끼|우동|소바|돈카츠|규카츠|오코노미야키|이자카야|카페|커피|디저트/.test(label || t)) {kind="food";name="식사";}
     return {kind,name,title:tag?t.slice(tag[0].length):t};
   }
+  // Keep route colours as tiny informational accents, separate from category colours.
+  const subwayLineColours = {
+    "미도스지선": "#E60012", "御堂筋線": "#E60012",
+    "사카이스지선": "#814721", "堺筋線": "#814721",
+    "요쓰바시선": "#0078BA", "四つ橋線": "#0078BA",
+    "다니마치선": "#822DBA", "谷町線": "#822DBA",
+    "주오선": "#019A66", "中央線": "#019A66",
+    "센니치마에선": "#E44D93", "千日前線": "#E44D93",
+    "나가호리쓰루미료쿠치선": "#A9CC51", "長堀鶴見緑地線": "#A9CC51",
+    "이마자토스지선": "#E6A000", "今里筋線": "#E6A000"
+  };
+  function appendRouteMemoText(parent, text, isMovement) {
+    if (!isMovement) {
+      parent.appendChild(document.createTextNode(text));
+      return;
+    }
+    const linePattern = /\\[([^\\]\\n]+)\\]/g;
+    let from = 0;
+    for (const match of text.matchAll(linePattern)) {
+      const line = match[1].trim();
+      const colour = subwayLineColours[line];
+      if (!colour) continue;
+      if (match.index > from) parent.appendChild(document.createTextNode(text.slice(from, match.index)));
+      const chip = document.createElement("span");
+      chip.className = "subway-line-chip";
+      chip.style.setProperty("--line-accent", colour);
+      chip.textContent = line;
+      parent.appendChild(chip);
+      from = match.index + match[0].length;
+    }
+    if (from < text.length) parent.appendChild(document.createTextNode(text.slice(from)));
+  }
+
   function renderTimelineDay(group, index) {
     const section=document.createElement("section");
     section.className="itinerary-day";
@@ -486,7 +519,7 @@ const STORAGE_KEY = "osaka_tabi_note_v1";
         }
         if (details.memo) {
           const note = document.createElement("span");
-          note.textContent = details.memo;
+          appendRouteMemoText(note, details.memo, cat.kind === "move");
           memo.appendChild(note);
         }
         body.appendChild(memo);
