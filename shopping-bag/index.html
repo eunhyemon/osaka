@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#faf9f6">
 <title>OSAKA SHOPPING BAG — HAILEY</title>
 <meta name="description" content="오사카 쇼핑 리스트를 장바구니에 담아보는 작은 놀이.">
-<link rel="stylesheet" href="./style.css?v=bag1">
-<script defer src="./app.js?v=bag1"></script>
+<link rel="stylesheet" href="./style.css?v=scattered-v2">
+<script defer src="./app.js?v=scattered-v2"></script>
 </head>
 <body>
 <main class="app">
@@ -16,12 +16,6 @@
     <span class="top-brand">HAILEY'S OSAKA <span class="dot"></span> 2026</span>
     <a class="archive-link" href="../">ARCHIVE ↗</a>
   </header>
-
-  <div class="intro">
-    <div class="eyebrow">INTERACTIVE SHOPPING LIST — 01 / OSAKA</div>
-    <h1>JUST <em>ONE</em><br>MORE THING<span class="period">.</span></h1>
-    <p>쇼핑백에 원하는 물건을 쏙 넣어보긔. <span>드래그하거나 카드를 탭하면 담을 수 있어요.</span></p>
-  </div>
 
   <section class="experience" aria-label="쇼핑백에 상품 담기">
     <div class="bag-zone" id="bag-zone" role="region" aria-label="상품을 놓아 담는 쇼핑백">
@@ -52,21 +46,16 @@
         </svg>
         <div class="bag-label" aria-hidden="true">OSAKA <span>26</span></div>
       </div>
-      <div class="drop-instruction" id="drop-instruction">DROP IT IN ↓</div>
+      <div class="items scattered-items" id="items" aria-label="쇼핑백 주변에 흩어진 상품"></div>
+      <div class="drop-instruction" id="drop-instruction">DRAG TO BAG ↗</div>
       <span class="bag-stamp" aria-hidden="true">お買い物<br>クラブ</span>
     </div>
 
-    <div class="shop-section">
-      <div class="shop-head">
-        <div>
-          <span class="micro">01 — PICK YOUR FAVORITES</span>
-          <h2>TO BUY <span id="product-count">00</span></h2>
-        </div>
-        <button class="shuffle" id="shuffle-btn" type="button">SHUFFLE ↗</button>
-      </div>
-      <div class="items" id="items" aria-label="상품 목록"></div>
-      <div class="status" id="status" role="status" aria-live="polite">쇼핑 목록을 불러오는 중…</div>
+    <div class="scene-controls">
+      <span class="micro">DRAG THE OBJECTS INTO THE BAG <span id="product-count">00</span></span>
+      <button class="shuffle" id="shuffle-btn" type="button">MORE OBJECTS ↗</button>
     </div>
+    <div class="status" id="status" role="status" aria-live="polite">쇼핑 목록을 불러오는 중…</div>
 
     <div class="bottom">
       <div class="totals">
