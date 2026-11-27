@@ -249,7 +249,7 @@ footer{border-top:1px solid var(--line);margin:70px 0 0;padding:18px 0 25px;disp
 .bag-scene .bag-skin{
   z-index:4;
   filter:none!important;
-  opacity:.94;
+  opacity:.78;
 }
 .bag-scene .bag-fill{
   left:3.1%!important;
@@ -263,5 +263,5 @@ footer{border-top:1px solid var(--line);margin:70px 0 0;padding:18px 0 25px;disp
     50.6% 100%,0% 93%,0% 40.1%
   )!important;
 }
-.bag-scene .bag-object{filter:blur(12px) saturate(.8)!important}
+.bag-scene .bag-object{filter:blur(7px) saturate(.9)!important}
 .bag-zone.is-over .bag-scene{transform:rotate(-1.5deg) scale(1.012)!important}
