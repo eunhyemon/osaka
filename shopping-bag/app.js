@@ -11,7 +11,7 @@
   ];
   const $=id=>document.getElementById(id);
   const bag=$('bag-zone'),scene=$('bag-scene'),productsEl=$('items');
-  let products=[],rate=905,isDemo=false,selection=new Set(),dragging=null;
+  let products=[],rate=905,isDemo=false,selection=new Set(),dragging=null,scenePage=0;
   try{
     const stored=JSON.parse(localStorage.getItem(BAG_KEY)||'[]');
     if(Array.isArray(stored))selection=new Set(stored.map(String));
@@ -96,27 +96,33 @@
     $('total-won').textContent='≈ '+formatWon(total*rate/100);
     bag.classList.toggle('is-filled',list.length>0);
   };
+  // Product images are physical objects around the bag, not labeled cards.
+  // Show a manageable handful at a time so every item stays draggable.
   const render=()=>{
-    const anchor=document.createDocumentFragment();
-    products.forEach(p=>{
-      const card=document.createElement('button');
-      card.type='button';card.className='product'+(selection.has(p.id)?' is-in':'');
-      card.setAttribute('aria-label',p.name+(selection.has(p.id)?' 쇼핑백에서 빼기':' 쇼핑백에 담기'));
-      card.dataset.id=p.id;
-      const inner=document.createElement('div');inner.className='product-inner';
-      const badge=document.createElement('span');badge.className='badge';badge.textContent='IN BAG ✓';badge.hidden=!selection.has(p.id);
-      const image=document.createElement('div');image.className='product-picture';image.appendChild(imageEl(p));
-      const name=document.createElement('div');name.className='product-name';name.textContent=p.name;
-      const foot=document.createElement('div');foot.className='product-foot';
-      const price=document.createElement('span');price.className='product-price';price.textContent=formatYen(p.price);
-      const qty=document.createElement('span');qty.className='product-count';qty.textContent=p.qty>1?'×'+p.qty:'';
-      foot.append(price,qty);inner.append(image,name,foot);card.append(badge,inner);
-      card.addEventListener('click',()=>toggle(p.id));
-      enableDrag(card,p);
-      anchor.appendChild(card);
+    const available=products.filter(p=>!selection.has(p.id));
+    const pageSize=10;
+    const pages=Math.max(1,Math.ceil(available.length/pageSize));
+    scenePage=((scenePage%pages)+pages)%pages;
+    const showing=available.slice(scenePage*pageSize,(scenePage+1)*pageSize);
+    const fragment=document.createDocumentFragment();
+    showing.forEach((p,i)=>{
+      const object=document.createElement('button');
+      object.type='button';
+      object.className='product floating-product';
+      object.dataset.id=p.id;
+      object.style.setProperty('--slot',String(i));
+      object.setAttribute('aria-label',p.name+' / '+formatYen(p.price)+' 쇼핑백에 담기');
+      object.title=p.name+' · '+formatYen(p.price);
+      const pic=document.createElement('span');pic.className='product-picture';
+      pic.appendChild(imageEl(p));
+      object.appendChild(pic);
+      object.addEventListener('click',()=>add(p.id));
+      enableDrag(object,p);
+      fragment.appendChild(object);
     });
-    productsEl.replaceChildren(anchor);
-    $('product-count').textContent=String(products.length).padStart(2,'0');
+    productsEl.replaceChildren(fragment);
+    $('product-count').textContent=String(available.length).padStart(2,'0')+' LEFT';
+    $('shuffle-btn').textContent=pages>1?'MORE OBJECTS ↗':'SHUFFLE ↗';
     renderBag();
     $('empty-btn').disabled=!selectedProducts().length;
     $('empty-btn').style.opacity=selectedProducts().length?'1':'.35';
@@ -125,6 +131,7 @@
     card.addEventListener('pointerdown',e=>{
       if(e.button!==0||dragging)return;
       dragging={id:e.pointerId,p,startX:e.clientX,startY:e.clientY,active:false,ghost:null,card};
+      try{card.setPointerCapture(e.pointerId)}catch(_){}
     });
   }
   const pointWithin=(x,y,rect)=>x>=rect.left&&x<=rect.right&&y>=rect.top&&y<=rect.bottom;
@@ -152,7 +159,9 @@
       else status('쇼핑백 위로 물건을 가져가면 담을 수 있어요.');
       d.ghost?.remove();d.card.classList.remove('is-dragged');
     }
-    bag.classList.remove('is-over');dragging=null;
+    bag.classList.remove('is-over');
+    try{d.card.releasePointerCapture(e.pointerId)}catch(_){}
+    dragging=null;
   };
   document.addEventListener('pointerup',finish);
   document.addEventListener('pointercancel',finish);
@@ -162,9 +171,14 @@
     status('쇼핑백을 비웠어요. 다시 담아볼까요?');
   });
   $('shuffle-btn').addEventListener('click',()=>{
-    for(let i=products.length-1;i>0;i--){
-      const j=Math.floor(Math.random()*(i+1));
-      [products[i],products[j]]=[products[j],products[i]];
+    const remaining=products.filter(p=>!selection.has(p.id)).length;
+    if(remaining>10)scenePage=(scenePage+1)%Math.ceil(remaining/10);
+    else{
+      for(let i=products.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [products[i],products[j]]=[products[j],products[i]];
+      }
+      scenePage=0;
     }
     render();
   });
