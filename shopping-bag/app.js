@@ -11,7 +11,7 @@
   ];
   const $=id=>document.getElementById(id);
   const bag=$('bag-zone'),scene=$('bag-scene'),productsEl=$('items');
-  let products=[],rate=905,isDemo=false,selection=new Set(),dragging=null,scenePage=0;
+  let products=[],rate=905,isDemo=false,selection=new Set(),dragging=null;
   try{
     const stored=JSON.parse(localStorage.getItem(BAG_KEY)||'[]');
     if(Array.isArray(stored))selection=new Set(stored.map(String));
@@ -102,10 +102,11 @@
   // Show a manageable handful at a time so every item stays draggable.
   const render=()=>{
     const available=products.filter(p=>!selection.has(p.id));
-    const pageSize=10;
-    const pages=Math.max(1,Math.ceil(available.length/pageSize));
-    scenePage=((scenePage%pages)+pages)%pages;
-    const showing=available.slice(scenePage*pageSize,(scenePage+1)*pageSize);
+    const showing=available;
+    // Keep enough room for every object; the shopping bag stays in view as you scroll.
+    const rowHeight=matchMedia('(max-width:700px)').matches?88:147;
+    const zoneHeight=Math.max(matchMedia('(max-width:700px)').matches?490:650, Math.ceil(showing.length/2)*rowHeight+38);
+    bag.style.height=zoneHeight+'px';
     const fragment=document.createDocumentFragment();
     showing.forEach((p,i)=>{
       const object=document.createElement('button');
@@ -124,7 +125,6 @@
     });
     productsEl.replaceChildren(fragment);
     $('product-count').textContent=String(available.length).padStart(2,'0')+' LEFT';
-    $('shuffle-btn').textContent=pages>1?'MORE OBJECTS ↗':'SHUFFLE ↗';
     renderBag();
     $('empty-btn').disabled=!selectedProducts().length;
     $('empty-btn').style.opacity=selectedProducts().length?'1':'.35';
@@ -171,18 +171,6 @@
     if(!selection.size)return;
     selection.clear();saveSelection();render();
     status('쇼핑백을 비웠어요. 다시 담아볼까요?');
-  });
-  $('shuffle-btn').addEventListener('click',()=>{
-    const remaining=products.filter(p=>!selection.has(p.id)).length;
-    if(remaining>10)scenePage=(scenePage+1)%Math.ceil(remaining/10);
-    else{
-      for(let i=products.length-1;i>0;i--){
-        const j=Math.floor(Math.random()*(i+1));
-        [products[i],products[j]]=[products[j],products[i]];
-      }
-      scenePage=0;
-    }
-    render();
   });
   let initialized=false;
   const apply=data=>{
