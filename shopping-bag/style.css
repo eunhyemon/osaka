@@ -89,3 +89,79 @@ footer{border-top:1px solid var(--line);margin:70px 0 0;padding:18px 0 25px;disp
  footer{margin-top:65px;font-size:8px}
 }
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+
+/* v2: an editorial still life. The objects float around the bag with no cards or captions. */
+.app{max-width:1480px}
+.experience{max-width:1180px}
+.bag-zone{height:clamp(540px,65vw,750px);margin-top:2px;overflow:visible;isolation:isolate}
+.bag-scene{width:min(540px,57vw);height:min(580px,61vw);z-index:1;pointer-events:none}
+.bag-zone .bag-side-note{left:1%;top:50%}
+.bag-zone .drop-instruction{right:0;top:51%}
+.bag-zone .bag-stamp{right:7%;bottom:9%}
+.bag-zone .scattered-items{
+  position:absolute;inset:0;z-index:6;display:block!important;
+  width:100%;height:100%;overflow:visible!important;
+  margin:0;padding:0;pointer-events:none;scroll-snap-type:none!important
+}
+.scattered-items .floating-product{
+  position:absolute!important;
+  width:clamp(76px,10vw,126px)!important;height:clamp(76px,10vw,126px)!important;
+  flex:none!important;display:grid;place-items:center;
+  padding:0!important;margin:0!important;border:0!important;
+  border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;overflow:visible!important;
+  cursor:grab;touch-action:none!important;pointer-events:auto;
+  transform:rotate(var(--angle,0deg));
+  transition:filter .2s,transform .25s cubic-bezier(.2,.7,.2,1);
+  -webkit-user-select:none;user-select:none
+}
+.scattered-items .floating-product:hover{
+  background:transparent!important;
+  transform:translateY(-6px) rotate(var(--angle,0deg)) scale(1.055);
+  filter:drop-shadow(0 7px 10px rgba(0,0,0,.09));
+}
+.scattered-items .floating-product.is-dragged{opacity:.35}
+.scattered-items .floating-product .product-picture{
+  display:flex!important;align-items:center;justify-content:center;
+  width:100%;height:100%!important;pointer-events:none
+}
+.scattered-items .floating-product img{
+  max-width:100%!important;max-height:100%!important;
+  width:auto;height:auto;object-fit:contain;mix-blend-mode:normal!important;
+}
+.scattered-items .floating-product:nth-child(1){left:3%;top:15%;--angle:-10deg}
+.scattered-items .floating-product:nth-child(2){left:9%;top:41%;--angle:8deg}
+.scattered-items .floating-product:nth-child(3){left:2%;top:69%;--angle:-6deg}
+.scattered-items .floating-product:nth-child(4){left:28%;top:77%;--angle:12deg}
+.scattered-items .floating-product:nth-child(5){right:3%;top:14%;--angle:8deg}
+.scattered-items .floating-product:nth-child(6){right:10%;top:40%;--angle:-9deg}
+.scattered-items .floating-product:nth-child(7){right:2%;top:70%;--angle:11deg}
+.scattered-items .floating-product:nth-child(8){right:27%;top:79%;--angle:-5deg}
+.scattered-items .floating-product:nth-child(9){left:24%;top:2%;--angle:6deg}
+.scattered-items .floating-product:nth-child(10){right:25%;top:1%;--angle:-9deg}
+.scene-controls{display:flex;align-items:center;justify-content:space-between;gap:15px;border-top:1px solid var(--line);padding:12px 0 0}
+.scene-controls .micro{font-size:10px}
+.scene-controls #product-count{display:inline-block;color:#aaa;margin-left:5px}
+.scene-controls .shuffle{white-space:nowrap;font-size:10px}
+.status{text-align:left;margin:9px 0 0;min-height:18px}
+.bottom{margin-top:24px}
+@media(max-width:700px){
+ .bag-zone{height:min(145vw,550px);min-height:435px;margin-top:14px}
+ .bag-scene{width:min(80vw,380px);height:min(85vw,395px)}
+ .scattered-items .floating-product{width:clamp(56px,17vw,83px)!important;height:clamp(56px,17vw,83px)!important}
+ .scattered-items .floating-product:nth-child(1){left:-2%;top:9%}
+ .scattered-items .floating-product:nth-child(2){left:0%;top:37%}
+ .scattered-items .floating-product:nth-child(3){left:-1%;top:66%}
+ .scattered-items .floating-product:nth-child(4){left:19%;top:82%}
+ .scattered-items .floating-product:nth-child(5){right:-2%;top:10%}
+ .scattered-items .floating-product:nth-child(6){right:0%;top:37%}
+ .scattered-items .floating-product:nth-child(7){right:-1%;top:67%}
+ .scattered-items .floating-product:nth-child(8){right:20%;top:82%}
+ .scattered-items .floating-product:nth-child(9){left:22%;top:0%}
+ .scattered-items .floating-product:nth-child(10){right:22%;top:0%}
+ .bag-zone .bag-side-note{left:-4%;top:48%}
+ .bag-zone .drop-instruction{right:-2%;top:54%}
+ .bag-zone .bag-stamp{right:4%;bottom:6%;font-size:10px}
+ .scene-controls .micro{font-size:8px}
+ .scene-controls .shuffle{font-size:9px}
+}
