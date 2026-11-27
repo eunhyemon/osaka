@@ -236,3 +236,32 @@ footer{border-top:1px solid var(--line);margin:70px 0 0;padding:18px 0 25px;disp
 }
 /* Keep decorative caption removed even with cached legacy styles. */
 .bag-side-note{display:none!important}
+
+/* V5 — deliberately rough, flat plastic carrier (not a structured shopping bag). */
+.bag-scene,
+.bag-zone .bag-scene{
+  filter:none!important;
+  transform-origin:50% 58%;
+}
+.bag-scene .handles,
+.bag-scene .bag-label,
+.bag-zone .bag-stamp{display:none!important}
+.bag-scene .bag-skin{
+  z-index:4;
+  filter:none!important;
+  opacity:.94;
+}
+.bag-scene .bag-fill{
+  left:3.1%!important;
+  right:1.4%!important;
+  top:7.4%!important;
+  bottom:1.5%!important;
+  clip-path:polygon(
+    19.5% 0%,23.5% 5%,38.4% 1.5%,
+    33.1% 28.9%,55.2% 33.8%,52.3% 2.1%,
+    65.3% 4.6%,94.5% 38.9%,100% 93%,
+    50.6% 100%,0% 93%,0% 40.1%
+  )!important;
+}
+.bag-scene .bag-object{filter:blur(12px) saturate(.8)!important}
+.bag-zone.is-over .bag-scene{transform:rotate(-1.5deg) scale(1.012)!important}
