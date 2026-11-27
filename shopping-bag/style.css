@@ -42,7 +42,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #171817;outline-offset:4p
 .shuffle{border:0;background:none;font:500 11px 'DM Mono',monospace;padding:10px 0}
 .shuffle:hover{text-decoration:underline;text-underline-offset:4px}
 .items{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:16px}
-.product{border:1px solid transparent;background:#f1f0ed;border-radius:13px;min-width:0;position:relative;overflow:hidden;cursor:grab;touch-action:pan-y;transition:transform .2s,background .2s,border-color .2s}
+.product{border:1px solid transparent;background:#f1f0ed;border-radius:13px;min-width:0;position:relative;overflow:hidden;cursor:grab;touch-action:pan-x;transition:transform .2s,background .2s,border-color .2s}
 .product:hover{transform:translateY(-4px);background:#ebebe7}
 .product:active{cursor:grabbing}.product.is-in{border-color:#e5d8dc;background:#f4eff0}
 .product .product-inner{padding:12px 11px 15px;min-width:0}
