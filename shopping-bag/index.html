@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#faf9f6">
+<title>OSAKA SHOPPING BAG — HAILEY</title>
+<meta name="description" content="오사카 쇼핑 리스트를 장바구니에 담아보는 작은 놀이.">
+<link rel="stylesheet" href="./style.css?v=bag1">
+<script defer src="./app.js?v=bag1"></script>
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <a class="back" href="../my-receipt/" aria-label="영수증으로 돌아가기">← MY RECEIPT</a>
+    <span class="top-brand">HAILEY'S OSAKA <span class="dot"></span> 2026</span>
+    <a class="archive-link" href="../">ARCHIVE ↗</a>
+  </header>
+
+  <div class="intro">
+    <div class="eyebrow">INTERACTIVE SHOPPING LIST — 01 / OSAKA</div>
+    <h1>JUST <em>ONE</em><br>MORE THING<span class="period">.</span></h1>
+    <p>쇼핑백에 원하는 물건을 쏙 넣어보긔. <span>드래그하거나 카드를 탭하면 담을 수 있어요.</span></p>
+  </div>
+
+  <section class="experience" aria-label="쇼핑백에 상품 담기">
+    <div class="bag-zone" id="bag-zone" role="region" aria-label="상품을 놓아 담는 쇼핑백">
+      <span class="bag-side-note" aria-hidden="true">MY LITTLE<br>OSAKA HAUL</span>
+      <div class="bag-scene" id="bag-scene">
+        <svg class="handles" viewBox="0 0 520 540" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M169 104 C169 1 350 1 350 104" fill="none" stroke="#dadbd7" stroke-width="19" stroke-linecap="round"/>
+          <path d="M182 104 C181 26 339 26 338 104" fill="none" stroke="#fff" stroke-opacity=".78" stroke-width="8"/>
+        </svg>
+        <div class="bag-fill" id="bag-fill" aria-hidden="true"></div>
+        <svg class="bag-skin" viewBox="0 0 520 540" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="bag-film" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#f8f8f6" stop-opacity=".90"/>
+              <stop offset=".48" stop-color="#eaece8" stop-opacity=".55"/>
+              <stop offset="1" stop-color="#e1e5e1" stop-opacity=".82"/>
+            </linearGradient>
+            <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#d5d9d5" stop-opacity=".30"/>
+              <stop offset=".56" stop-color="#fff" stop-opacity=".18"/>
+              <stop offset="1" stop-color="#cdd0cc" stop-opacity=".47"/>
+            </linearGradient>
+          </defs>
+          <path fill="url(#bag-film)" fill-rule="evenodd" d="M111 101 L411 101 L493 452 L269 520 L28 457 Z M190 103 L330 103 L326 162 L188 162 Z"/>
+          <path fill="url(#edge)" opacity=".42" d="M28 457 L269 520 L493 452 L461 457 L267 496 L64 445 Z"/>
+          <path d="M111 101 L411 101 L493 452 L269 520 L28 457 Z" fill="none" stroke="#d7d9d5" stroke-opacity=".52" stroke-width="1.5"/>
+          <path d="M188 162 L190 103 L330 103 L326 162" fill="none" stroke="#d4d6d2" stroke-opacity=".6" stroke-width="2"/>
+        </svg>
+        <div class="bag-label" aria-hidden="true">OSAKA <span>26</span></div>
+      </div>
+      <div class="drop-instruction" id="drop-instruction">DROP IT IN ↓</div>
+      <span class="bag-stamp" aria-hidden="true">お買い物<br>クラブ</span>
+    </div>
+
+    <div class="shop-section">
+      <div class="shop-head">
+        <div>
+          <span class="micro">01 — PICK YOUR FAVORITES</span>
+          <h2>TO BUY <span id="product-count">00</span></h2>
+        </div>
+        <button class="shuffle" id="shuffle-btn" type="button">SHUFFLE ↗</button>
+      </div>
+      <div class="items" id="items" aria-label="상품 목록"></div>
+      <div class="status" id="status" role="status" aria-live="polite">쇼핑 목록을 불러오는 중…</div>
+    </div>
+
+    <div class="bottom">
+      <div class="totals">
+        <span class="micro">IN MY BAG <b id="bag-count">00</b> PCS</span>
+        <div class="total"><span id="total-yen">¥0</span><small id="total-won">≈ ₩0</small></div>
+      </div>
+      <div class="bottom-actions">
+        <button class="empty-btn" id="empty-btn" type="button">EMPTY BAG ×</button>
+        <a class="receipt-btn" href="../my-receipt/">VIEW RECEIPT ↗</a>
+      </div>
+    </div>
+    <div class="bag-items" id="bag-items" aria-label="쇼핑백에 담긴 상품"></div>
+  </section>
+
+  <footer>
+    <span>A LITTLE TOO MUCH? NEVER.</span>
+    <span>MADE FOR OSAKA, WITH LOVE.</span>
+  </footer>
+</main>
+</body>
+</html>
