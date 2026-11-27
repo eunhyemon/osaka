@@ -182,3 +182,57 @@ footer{border-top:1px solid var(--line);margin:70px 0 0;padding:18px 0 25px;disp
  display:grid;place-items:center;background:#fff;
  border:1px solid #ddd;font-size:14px
 }
+
+/* All products visible, two open columns around a sticky center bag. */
+.bag-zone{align-items:flex-start!important;justify-content:center!important}
+.bag-zone .bag-scene{
+ position:sticky!important;
+ top:clamp(72px,11vh,125px)!important;
+ align-self:flex-start!important;
+ flex:none!important;
+ margin-inline:auto!important;
+ width:min(530px,48%)!important;
+ height:auto!important;
+ aspect-ratio:520/540!important;
+}
+.bag-zone .scattered-items{
+ display:grid!important;
+ grid-template-columns:minmax(0,26%) minmax(0,26%)!important;
+ grid-auto-rows:147px!important;
+ justify-content:space-between!important;
+ align-content:start!important;
+ align-items:center!important;
+ row-gap:0!important;
+ padding:16px 0 0!important;
+}
+.scattered-items .floating-product{
+ position:relative!important;
+ top:auto!important;left:auto!important;right:auto!important;
+ justify-self:center!important;
+ width:clamp(80px,11vw,132px)!important;
+ height:clamp(80px,11vw,132px)!important;
+}
+.scattered-items .floating-product:nth-child(n){
+ top:auto!important;left:auto!important;right:auto!important;
+}
+.bag-zone .drop-instruction{position:sticky;top:50%;align-self:flex-start;pointer-events:none;visibility:hidden}
+.bag-zone.is-over .drop-instruction{visibility:visible}
+@media(max-width:700px){
+ .bag-zone .bag-scene{
+  top:clamp(70px,13vh,105px)!important;
+  width:67%!important;
+  height:auto!important
+ }
+ .bag-zone .scattered-items{
+  grid-template-columns:minmax(0,18%) minmax(0,18%)!important;
+  grid-auto-rows:88px!important;
+  padding-top:15px!important;
+ }
+ .scattered-items .floating-product{
+  width:clamp(50px,15vw,73px)!important;
+  height:clamp(50px,15vw,73px)!important;
+ }
+ .bag-zone .drop-instruction{display:none}
+}
+/* Keep decorative caption removed even with cached legacy styles. */
+.bag-side-note{display:none!important}
