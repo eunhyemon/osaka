@@ -83,11 +83,13 @@
     });
     list.forEach(p=>{
       const pill=document.createElement('div');pill.className='bag-pill';
-      const name=document.createElement('span');name.textContent=p.name;
+      pill.title=p.name;
+      const thumb=document.createElement('span');thumb.className='bag-pill-picture';
+      thumb.appendChild(imageEl(p));
       const removeBtn=document.createElement('button');removeBtn.type='button';
       removeBtn.textContent='×';removeBtn.setAttribute('aria-label',p.name+' 쇼핑백에서 빼기');
       removeBtn.addEventListener('click',()=>remove(p.id));
-      pill.append(name,removeBtn);pills.appendChild(pill);
+      pill.append(thumb,removeBtn);pills.appendChild(pill);
     });
     const quantity=list.reduce((sum,p)=>sum+p.qty,0);
     const total=list.reduce((sum,p)=>sum+p.price*p.qty,0);
